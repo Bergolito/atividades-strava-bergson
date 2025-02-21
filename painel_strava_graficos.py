@@ -68,7 +68,19 @@ def gera_graficos_fluxo_por_tipo(titulo, df_atividades):
     ).interactive()
 
     return grafico
+# =======================================================
+def gera_graficos_fluxo_por_dia_semana(titulo, df_atividades):
 
+    grafico = alt.Chart(df_atividades).mark_area().encode(
+        alt.X('ano:N').axis(domain=False, tickSize=0),
+        alt.Y('sum(qtd):Q').stack('center').axis(None),
+        alt.Color('dia_semana:N').scale(scheme='category20b').title('Dia da Semana')
+    ).properties(
+        title=titulo,
+        width=800, height=600            
+    ).interactive()
+
+    return grafico
 # =======================================================
 
 # =======================================================
@@ -87,6 +99,72 @@ def grafico_barras_empilhadas_por_tupo(titulo, df):
     
     return grafico
 # =======================================================
+def grafico_barras_empilhadas_por_dia_semana(titulo, df):
+
+    grafico = alt.Chart(df).mark_bar(width=20).encode(
+        alt.X('ano:N', title='Ano'),
+        alt.Y('sum(qtd)', title='Soma das Quantidades'),
+        alt.Color('dia_semana', title='Dia da Semana')
+    ).properties(
+            title=titulo,
+            width=800, height=600
+    ).interactive()   
+    
+    return grafico
+# =======================================================
+
+
+# =======================================================
+# Gráficos de Mapa de Calor (Heatmap)
+# =======================================================
+def gera_graficos_mapa_calor_por_tipo_atv(df_atividades, titulo):
+                                            
+    heatmap = alt.Chart(df_atividades).mark_rect().encode(
+        x=alt.X('ano:O', title=None, axis=alt.Axis(orient='top')),  # Define a orientação do eixo x como 'top'
+        y=alt.Y('tipo_atividade:N', title=None),
+        color=alt.Color('qtd:Q', title='Qtd de Atividades' ,scale=alt.Scale(scheme='yellowgreenblue')),    
+    )
+
+    # Adiciona o texto dentro de cada célula com o valor real e ajusta a cor do texto
+    text = alt.Chart(df_atividades).mark_text(baseline='middle', fontSize=10).encode(
+        x='ano:O',
+        y='tipo_atividade:O',
+        text=alt.Text('qtd:Q', format='.0f'),
+    )
+
+    # Combina o gráfico de calor com o texto
+    heatmap_with_text = (heatmap + text).properties(
+        width=800,
+        height=600,
+        title=titulo
+    )
+
+    return heatmap_with_text                                    
+# ==========================================================================
+def gera_graficos_mapa_calor_por_dia_semana_atv(df_atividades, titulo):
+                                            
+    heatmap = alt.Chart(df_atividades).mark_rect().encode(
+        x=alt.X('ano:O', title=None, axis=alt.Axis(orient='top')),  # Define a orientação do eixo x como 'top'
+        y=alt.Y('dia_semana:N', title=None),
+        color=alt.Color('qtd:Q', title='Qtd de Atividades' ,scale=alt.Scale(scheme='yellowgreenblue')),    
+    )
+
+    # Adiciona o texto dentro de cada célula com o valor real e ajusta a cor do texto
+    text = alt.Chart(df_atividades).mark_text(baseline='middle', fontSize=10).encode(
+        x='ano:O',
+        y='dia_semana:O',
+        text=alt.Text('qtd:Q', format='.0f'),
+    )
+
+    # Combina o gráfico de calor com o texto
+    heatmap_with_text = (heatmap + text).properties(
+        width=800,
+        height=600,
+        title=titulo
+    )
+
+    return heatmap_with_text                                    
+# ==========================================================================
 
 
 # =======================================================
@@ -109,122 +187,10 @@ def gera_grafico_por_dia_semana(titulo, contagem_por_dia_semana):
 
     return chart
 # =======================================================    
-def gera_grafico_por_tipo_veiculo(titulo, contagem_por_tipo_veiculo):
-
-    lista_cores = alt.Scale(domain=contagem_por_tipo_veiculo['tipo_veiculo'].unique(),
-    range=lista_cores_graficos)
-                                
-    chart = alt.Chart(contagem_por_tipo_veiculo).mark_bar().encode(
-        y=alt.Y('tipo_veiculo:N', title='Tipo de Veículo',  sort='-x', axis=alt.Axis(labelLimit=200)),
-        x=alt.X('qtd:Q', title='Quantidade de Acidentes',  axis=alt.Axis(labelAngle=-45)),
-        tooltip=['tipo_veiculo', 'qtd'],
-        color=alt.Color('tipo_veiculo:N', title='Tipo do Veículo', scale=lista_cores)
-
-    ).properties(
-        title=titulo,
-        width=800,
-        height=600         
-    ).interactive()
-
-    return chart
-# =======================================================
-
-# ==========================================================================
-# Funções da Aba 06 
-# ==========================================================================
-def grafico_barras_empilhadas_por_uf(titulo, df):
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('uf', title='UF')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-    
-    return grafico
-# ==========================================================================
-def grafico_barras_empilhadas_por_br(titulo, df):
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('br:N', title='BR')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-
-    return grafico
-# ==========================================================================
-def grafico_barras_empilhadas_por_tipo(titulo, df):
-
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('tipo_acidente', title='Tipo do Acidente')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-
-    return grafico
-# ==========================================================================
-def grafico_barras_empilhadas_por_causa(titulo, df):
-        
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('causa_acidente', title='Causa do Acidente')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-
-    return grafico
-# ==========================================================================
-def grafico_barras_empilhadas_por_classificacao(titulo, df):
-        
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('classificacao_acidente', title='Classificação do Acidente')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-
-    return grafico
-# ==========================================================================
-def grafico_barras_empilhadas_por_fase_dia(titulo, df):
-        
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('fase_dia', title='Fase do Dia')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-
-    return grafico
-# ==========================================================================
-def grafico_barras_empilhadas_por_condicao_metereologica(titulo, df):
-        
-    grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
-        alt.Y('sum(qtd)', title='Soma das Quantidades'),
-        alt.Color('condicao_metereologica', title='Condição Metereológica')
-    ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
-
-    return grafico
-# ==========================================================================
 def grafico_barras_empilhadas_por_dia_semana(titulo, df):
         
     grafico = alt.Chart(df).mark_bar(width=20).encode(
-        alt.X('ano', title='Ano'),
+        alt.X('ano:N', title='Ano'),
         alt.Y('sum(qtd)', title='Soma das Quantidades'),
         alt.Color('dia_semana', title='Dia da Semana')
     ).properties(
@@ -261,250 +227,9 @@ def gera_grafico_ranking_tipo_01(df_atividades, titulo):
 
     return grafico
 # ==========================================================================
-def gera_grafico_ranking_tipo_01_interativo(df_atividades, titulo):
+def gera_grafico_ranking_dia_semana_01(df_atividades, titulo):
 
-    selection = alt.selection_point(fields=['tipo_atividade'])
-    color = alt.condition(
-        selection,
-        alt.Color('tipo_atividade:N',title='Tipo de Atv').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico1 = alt.Chart(df_atividades).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color 
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title=titulo,
-        width=800,
-        height=600,
-    )
-
-    legend = alt.Chart(df_atividades).mark_point().encode(
-        alt.Y('tipo_atividade:N').axis(orient='right'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico1 | legend
-# ==========================================================================
-def gera_grafico_ranking_uf_02(df_acidentes_geral_por_uf):
-
-    grafico2 = alt.Chart(df_acidentes_geral_por_uf).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color('uf:N', title='UF'),
-        tooltip=['uf', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por UF  (2007 a 2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['uf'], bind='legend')
-    ).interactive()
-
-    return  grafico2
-# ==========================================================================
-def gera_grafico_ranking_tipo_aaaa_01(df_acidentes_geral_por_tipo, titulo):
-
-    grafico1 = alt.Chart(df_acidentes_geral_por_tipo).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("tipo_acidente:N", title='Tipo de Acidente')
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title=titulo,
-        width=800,
-        height=600,
-    )
-    
-    return grafico1
-# ==========================================================================
-def gera_grafico_ranking_tipo_aaaa_01_interativo(df_acidentes_geral_por_tipo):
-
-    selection = alt.selection_point(fields=['tipo_acidente'])
-    color = alt.condition(
-        selection,
-        alt.Color('tipo_acidente:N', title='Tipo de Acidente').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico1 = alt.Chart(df_acidentes_geral_por_tipo).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking dos Tipos de Acidentes (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-    
-    legend = alt.Chart(df_acidentes_geral_por_tipo).mark_point().encode(
-        alt.Y('tipo_acidente:N').axis(orient='right').title('Tipo de Acidente'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico1 | legend    
-# ==========================================================================
-def gera_grafico_ranking_tipo_02(df_acidentes_geral_por_tipo):
-    grafico2 = alt.Chart(df_acidentes_geral_por_tipo).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color('tipo_acidente:N', title='Tipo de Acidente'),
-        tooltip=['tipo_acidente', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por Tipo  (2007 a 2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico2
-# ==========================================================================
-def gera_grafico_ranking_br_01(qtd_brs, df_acidentes_geral_por_br):
-    grafico_ranking_br_01 = alt.Chart(df_acidentes_geral_por_br).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("br:N", title='BR')
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title=f"Ranking das {qtd_brs} BRs com mais acidentes  (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-    return grafico_ranking_br_01
-# ==========================================================================
-def gera_grafico_ranking_br_01_interativo(df_acidentes_geral_por_br):
-
-    selection = alt.selection_point(fields=['br'])
-    color = alt.condition(
-        selection,
-        alt.Color('br:N', title='BR').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico_ranking_br_01 = alt.Chart(df_acidentes_geral_por_br).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das 20 BRs com mais acidentes  (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-
-    legend = alt.Chart(df_acidentes_geral_por_br).mark_point().encode(
-        alt.Y('br:N').axis(orient='right'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico_ranking_br_01 + legend
-# ==========================================================================
-def gera_grafico_ranking_br_02(qtd_brs, df_acidentes_geral_por_br):
-    grafico_ranking_br_02 = alt.Chart(df_acidentes_geral_por_br).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color("br:N", title='BR'),
-        tooltip=['br', 'qtd', 'ano']
-    ).properties(
-        title=f'Evolução da Quantidade de Acidentes para as {qtd_brs} (2007-2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico_ranking_br_02      
-# ==========================================================================
-def gera_grafico_ranking_classificacao_01(df_acidentes_geral_por_classificacao):
-
-    grafico_ranking_classif_01 = alt.Chart(df_acidentes_geral_por_classificacao).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("classificacao_acidente:N", title='Classificação')
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das Classificações dos Acidentes (2007 a 2024)",
-        width=800, height=600,
-    )
-    return grafico_ranking_classif_01
-# ==========================================================================
-def gera_grafico_ranking_classificacao_02(df_acidentes_geral_por_classificacao):
-
-    grafico_ranking_classif_02 = alt.Chart(df_acidentes_geral_por_classificacao).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color("classificacao_acidente:N", title='Classificação'),
-        tooltip=['classificacao_acidente', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por Classificação (2007-2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico_ranking_classif_02
-# ==========================================================================
-def gera_grafico_ranking_fasedia_01(df_acidentes_geral_por_fasedia):
-
-    grafico_ranking_fasedia_01 = alt.Chart(df_acidentes_geral_por_fasedia).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("fase_dia:N", title='Fase do Dia')
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das Fases dos Acidentes (2007 a 2024)",
-        width=800, height=600,
-    )
-
-    return grafico_ranking_fasedia_01
-# ==========================================================================
-def gera_grafico_ranking_fasedia_02(df_acidentes_geral_por_fasedia):
-
-    grafico_ranking_fasedia_02 = alt.Chart(df_acidentes_geral_por_fasedia).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color("fase_dia:N", title='Fase do Dia'),
-        tooltip=['fase_dia', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por Fase do Dia (2007-2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico_ranking_fasedia_02
-# ==========================================================================
-def gera_grafico_ranking_diasemana_01(df_acidentes_geral_por_dia_semana):
-
-    grafico_ranking_dia_semana_01 = alt.Chart(df_acidentes_geral_por_dia_semana).mark_line(point=True).encode(
+    grafico_ranking_01 = alt.Chart(df_atividades).mark_line(point=True).encode(
         x=alt.X('ano:O', title='Ano'),
         y=alt.Y("rank:O", title='Posição do Ranking'),
         color=alt.Color("dia_semana:N", title="Dia da Semana")
@@ -513,44 +238,11 @@ def gera_grafico_ranking_diasemana_01(df_acidentes_geral_por_dia_semana):
         sort=[alt.SortField("qtd", order="descending")],
         groupby=["ano"]
     ).properties(
-        title="Ranking dos dos Acidentes por Dia da Semana (2007 a 2024)",
+        title=titulo,
         width=800, height=600,
     )
 
-    return grafico_ranking_dia_semana_01
-
-# ==========================================================================
-def gera_grafico_ranking_diasemana_01_interativo(df_acidentes_geral_por_dia_semana):
-
-    selection = alt.selection_point(fields=['dia_semana'])
-    color = alt.condition(
-        selection,
-        alt.Color('dia_semana:N',title='UF').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico1 = alt.Chart(df_acidentes_geral_por_dia_semana).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color 
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking dos dos Acidentes por Dia da Semana (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-
-    legend = alt.Chart(df_acidentes_geral_por_dia_semana).mark_point().encode(
-        alt.Y('dia_semana:N').axis(orient='right').title('Dia da Semana'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico1 | legend
+    return grafico_ranking_01
 # ==========================================================================
 def gera_grafico_ranking_diasemana_02(df_acidentes_geral_por_dia_semana):
 
@@ -567,202 +259,6 @@ def gera_grafico_ranking_diasemana_02(df_acidentes_geral_por_dia_semana):
     ).interactive()
 
     return grafico_ranking_dia_semana_02
-# ==========================================================================
-def gera_grafico_ranking_tipoveiculo_01(df_acidentes_geral_por_tipo_veiculo):
-
-    grafico_ranking_tipo_veiculo_01 = alt.Chart(df_acidentes_geral_por_tipo_veiculo).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("tipo_veiculo:N", title="Tipo de Veículo"),
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking dos dos Acidentes por Tipo de Veículo (2007 a 2024)",
-        width=800, height=600,
-    )
-
-    return grafico_ranking_tipo_veiculo_01     
-# ==========================================================================
-def gera_grafico_ranking_tipoveiculo_01_interativo(df_acidentes_geral_por_tipo_veiculo):
-
-    selection = alt.selection_point(fields=['tipo_veiculo'])
-    color = alt.condition(
-        selection,
-        alt.Color('tipo_veiculo:N',title='UF').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico1 = alt.Chart(df_acidentes_geral_por_tipo_veiculo).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color 
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking dos Tipos de Veículos envolvidos nos Acidentes (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-
-    legend = alt.Chart(df_acidentes_geral_por_tipo_veiculo).mark_point().encode(
-        alt.Y('tipo_veiculo:N').axis(orient='right').title('Tipo de Veículo'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico1 | legend
-# ==========================================================================
-def gera_grafico_ranking_tipoveiculo_02(df_acidentes_geral_por_tipo_veiculo):
-
-    grafico_ranking_tipo_veiculo_02 = alt.Chart(df_acidentes_geral_por_tipo_veiculo).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color("tipo_veiculo:N", title="Tipo de Veículo"),
-        tooltip=['tipo_veiculo', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por Tipo de Veículo (2007-2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico_ranking_tipo_veiculo_02
-# ==========================================================================
-def gera_grafico_ranking_causa_01(df_acidentes_geral_por_causa):
-
-    grafico_ranking_causa_01 = alt.Chart(df_acidentes_geral_por_causa).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("causa_acidente:N", title='Causa do Acidente')
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das Causas dos Acidentes (2007 a 2024)",
-        width=800, height=600,
-    )
-    return grafico_ranking_causa_01
-
-# ==========================================================================
-def gera_grafico_ranking_causa_01_interativo(df_acidentes_geral_por_causa):
-
-    selection = alt.selection_point(fields=['causa_acidente'])
-    color = alt.condition(
-        selection,
-        alt.Color('causa_acidente:N', title='Causa do Acidente').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico1 = alt.Chart(df_acidentes_geral_por_causa).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das Causas dos Acidentes (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-    
-    legend = alt.Chart(df_acidentes_geral_por_causa).mark_point().encode(
-        alt.Y('causa_acidente:N').axis(orient='right').title('Causa do Acidente'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico1 | legend    
-
-# ==========================================================================
-def gera_grafico_ranking_causa_02(df_acidentes_geral_por_causa):
-
-    grafico_ranking_classif_02 = alt.Chart(df_acidentes_geral_por_causa).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color("causa_acidente:N", title='Causa do Acidente'),
-        tooltip=['causa_acidente', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por Causa (2007-2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico_ranking_classif_02
-# ==========================================================================
-def gera_grafico_ranking_condicao_metereologica_01(df_acidentes_geral_por_condicaometereologica):
-
-    grafico_ranking_cond = alt.Chart(df_acidentes_geral_por_condicaometereologica).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=alt.Color("condicao_metereologica:N", title='Condição Metereológica')
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das Condições Metereológicas dos Acidentes (2007 a 2024)",
-        width=800, height=600,
-    )
-    return grafico_ranking_cond
-
-# ==========================================================================
-def gera_grafico_ranking_condicao_metereologica_01_interativo(df_acidentes_geral_por_condicaometereologica):
-
-    selection = alt.selection_point(fields=['condicao_metereologica'])
-    color = alt.condition(
-        selection,
-        alt.Color('condicao_metereologica:N', title='Condição Metereológica do Acidente').legend(None),
-        alt.value('lightgray')
-    )
-
-    grafico1 = alt.Chart(df_acidentes_geral_por_condicaometereologica).mark_line(point=True).encode(
-        x=alt.X('ano:O', title='Ano'),
-        y=alt.Y("rank:O", title='Posição do Ranking'),
-        color=color
-    ).transform_window(
-        rank="rank()",
-        sort=[alt.SortField("qtd", order="descending")],
-        groupby=["ano"]
-    ).properties(
-        title="Ranking das Condições Metereológicas dos Acidentes (2007 a 2024)",
-        width=800,
-        height=600,
-    )
-    
-    legend = alt.Chart(df_acidentes_geral_por_condicaometereologica).mark_point().encode(
-        alt.Y('condicao_metereologica:N').axis(orient='right').title('Condição Metereológica do Acidente'),
-        color=color
-    ).add_params(
-        selection
-    )
-
-    return grafico1 | legend    
-# ==========================================================================
-def gera_grafico_ranking_condicao_metereologica_02(df_acidentes_geral_por_condicaometereologica):
-
-    grafico_ranking_cond = alt.Chart(df_acidentes_geral_por_condicaometereologica).mark_line(point=True).encode(
-        x=alt.X('ano:N', axis=alt.Axis(title='Ano')),
-        y=alt.Y('qtd:Q', axis=alt.Axis(title='Quantidade de Acidentes')),
-        color=alt.Color("condicao_metereologica:N", title='Condição Metereológica'),
-        tooltip=['condicao_metereologica', 'qtd', 'ano']
-    ).properties(
-        title='Evolução da Quantidade de Acidentes por Condição Metereológica (2007-2024)',
-        width=800, height=600
-    ).add_selection(
-        alt.selection_single(fields=['ano'], bind='legend')
-    ).interactive()
-
-    return grafico_ranking_cond
 # ==========================================================================
 
 # ==========================================================================

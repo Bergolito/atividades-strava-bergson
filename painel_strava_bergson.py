@@ -28,6 +28,7 @@ df_atividades_simplificado_2025 = pd.read_csv('datasets/atividades_fisicas_simpl
 
 
 df_atvs_tipo_todos = pd.read_csv('datasets/gerais/atividades_geral_por_tipo.csv', sep=',', encoding="UTF-8")
+df_atvs_dia_semana_todos = pd.read_csv('datasets/gerais/atividades_geral_por_dia_semana.csv', sep=',', encoding="UTF-8")
 
 # =======================================================
 # Constantes do dashboard
@@ -111,13 +112,14 @@ if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-tab_01, tab_02, tab_03, tab_04, tab_05 = st.tabs(
+tab_01, tab_02, tab_03, tab_04, tab_05, tab_06 = st.tabs(
   [
-    "Atividades Físicas por Critérios",
+    "Atividades por Critérios",
     "Atividades Físicas 02",
-    "Atividades Físicas por Ranking",
-    "Atividades Físicas por Barras Empilhadas",
-    "Atividades Físicas por Fluxo",
+    "Atividades por Ranking",
+    "Atividades por Barras Empilhadas",
+    "Atividades por Fluxo",
+    "Atividades por Mapa de Calor",
   ]
 )
 
@@ -156,12 +158,10 @@ else:
 with tab_01:
 
     # =======================================================
-    # aba 
+    # aba 01
     # =======================================================
     titulo = f'<h3> Atividades por Tipo'
     st.markdown(titulo, unsafe_allow_html=True)  
-
-    #lista_dfs = retorna_atividades_df_por_mes(df_selecionado)
 
     titulo = f'Atividades Físicas em {ano_selecionado1}'
     df_filtro = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
@@ -177,87 +177,85 @@ with tab_01:
 with tab_02:
 
     # =======================================================
-    # aba tab_bbb_01
+    # aba 02
     # =======================================================
     titulo = f'<h3> Atividades Físicas'
     st.markdown(titulo, unsafe_allow_html=True)  
 
-    # filtro
-    df_selecionado = df_atividades_simplificado_2024
-    ano_selecionado1 = 2024
-    if st.session_state.ano_selecionado is None:
-        df_selecionado = df_atividades_simplificado_2024
-    else:
-
-        if st.session_state.ano_selecionado == '2020':
-            ano_selecionado1 = 2020
-            df_selecionado = df_atividades_simplificado_2020
-
-        elif st.session_state.ano_selecionado == '2021':
-            ano_selecionado1 = 2021
-            df_selecionado = df_atividades_simplificado_2021    
-
-        elif st.session_state.ano_selecionado == '2022':
-            ano_selecionado1 = 2022
-            df_selecionado = df_atividades_simplificado_2022    
-
-        elif st.session_state.ano_selecionado == '2023':
-            ano_selecionado1 = 2023
-            df_selecionado = df_atividades_simplificado_2023    
-
-        elif st.session_state.ano_selecionado == '2024':
-            ano_selecionado1 = 2024
-            df_selecionado = df_atividades_simplificado_2024    
-
-        elif st.session_state.ano_selecionado == '2025':
-            ano_selecionado1 = 2025
-            df_selecionado = df_atividades_simplificado_2025    
-
-        for mes in range(0, 12):
-            print(f'ano => {ano_selecionado1} | mes => {mes}')
-            nome_mes = obter_mes_por_numero(mes)
-            titulo = f'Atividades Físicas em {nome_mes} de {ano_selecionado1}'
-            df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df_selecionado, ano_selecionado1, mes)
-            st.write(titulo) 
-            st.table(df_filtro)
-            grafico_ano_mes = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
-            st.altair_chart(grafico_ano_mes, use_container_width=False)
+    for mes in range(1, 13):
+        print(f'ano => {ano_selecionado1} | mes => {mes}')
+        nome_mes = obter_mes_por_numero(mes)
+        titulo = f'Atividades Físicas em {nome_mes} de {ano_selecionado1}'
+        df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df_selecionado, ano_selecionado1, mes)
+        st.write(titulo) 
+        st.table(df_filtro)
+        grafico_ano_mes = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
+        st.altair_chart(grafico_ano_mes, use_container_width=False)
 
 # ==============================================================================
 with tab_03:
 
     # =======================================================
-    # aba 
+    # aba 03
     # =======================================================
     titulo = f'<h3> Atividades por Ranking'
     st.markdown(titulo, unsafe_allow_html=True)  
 
-    titulo =f'Gráfico de Ranking de Atividades em {ano_selecionado1}'
-    grafico_ranking = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
-    st.altair_chart(grafico_ranking, use_container_width=False)
+    titulo =f'Ranking de Atividades por tipo (2020 a 2025)'
+    grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
+    st.altair_chart(grafico_ranking_01, use_container_width=False)
+
+    titulo =f'Ranking de Atividades por dia da semana (2020 a 2025)'
+    grafico_ranking_02 = gera_grafico_ranking_dia_semana_01(df_atvs_dia_semana_todos, titulo)
+    st.altair_chart(grafico_ranking_02, use_container_width=False)
 
 # ==============================================================================
 with tab_04:
 
     # =======================================================
-    # aba 
+    # aba 04
     # =======================================================
     titulo = f'<h3> Atividades por Barras Empilhadas'
     st.markdown(titulo, unsafe_allow_html=True)  
 
-    titulo =f'Gráfico de Barras Empilhadas de Atividades em {ano_selecionado1}'
-    grafico_barras_emp = grafico_barras_empilhadas_por_tupo(titulo, df_atvs_tipo_todos)    
-    st.altair_chart(grafico_barras_emp, use_container_width=False)
+    titulo =f'Barras Empilhadas de Atividades por tipo (2020 a 2025)'
+    grafico_barras_emp_01 = grafico_barras_empilhadas_por_tupo(titulo, df_atvs_tipo_todos)    
+    st.altair_chart(grafico_barras_emp_01, use_container_width=False)
+
+    titulo =f'Barras Empilhadas de Atividades por dia da semana (2020 a 2025)'
+    grafico_barras_emp_02 = grafico_barras_empilhadas_por_dia_semana(titulo, df_atvs_dia_semana_todos)    
+    st.altair_chart(grafico_barras_emp_02, use_container_width=False)
 
 # ==============================================================================
 with tab_05:
 
     # =======================================================
-    # aba 
+    # aba 05
     # =======================================================
     titulo = f'<h3> Atividades por Fluxo de Dados'
     st.markdown(titulo, unsafe_allow_html=True)  
 
-    titulo =f'Gráfico de Fluxo de Atividades em {ano_selecionado1}'
-    grafico_fluxo = gera_graficos_fluxo_por_tipo(titulo, df_atvs_tipo_todos)    
-    st.altair_chart(grafico_fluxo, use_container_width=False)
+    titulo =f'Fluxo de Atividades por tipo (2020 a 2025)'
+    grafico_fluxo_01 = gera_graficos_fluxo_por_tipo(titulo, df_atvs_tipo_todos)    
+    st.altair_chart(grafico_fluxo_01, use_container_width=False)
+
+    titulo =f'Fluxo de Atividades por dia da semana (2020 a 2025)'
+    grafico_fluxo_02 = gera_graficos_fluxo_por_dia_semana(titulo, df_atvs_dia_semana_todos)    
+    st.altair_chart(grafico_fluxo_02, use_container_width=False)
+
+# ==============================================================================
+with tab_06:
+
+    # =======================================================
+    # aba 06
+    # =======================================================
+    titulo = f'<h3> Atividades por Mapa de Calor'
+    st.markdown(titulo, unsafe_allow_html=True)  
+
+    titulo =f'Mapa de Calor por Tipo de Atividades (2020 a 2025)'
+    grafico_mapa_calor_01 = gera_graficos_mapa_calor_por_tipo_atv(df_atvs_tipo_todos, titulo)
+    st.altair_chart(grafico_mapa_calor_01, use_container_width=False)
+
+    titulo =f'Mapa de Calor por Dia da Semana (2020 a 2025)'
+    grafico_mapa_calor_02 = gera_graficos_mapa_calor_por_dia_semana_atv(df_atvs_dia_semana_todos, titulo)
+    st.altair_chart(grafico_mapa_calor_02, use_container_width=False)

@@ -3,6 +3,7 @@
 # =======================================================
 import pandas as pd
 import streamlit as st
+from datetime import datetime
 
 # ==================================
 # Funções
@@ -13,24 +14,40 @@ def calcula_tempo_atv_minutos(tempo):
     return (tempo / 60)
 # ==================================
 def retorna_ano_data(data_string):
-    from datetime import datetime
-
     formato = "%b %d, %Y, %I:%M:%S %p"  # Formato da sua string de data
-
     data_objeto = datetime.strptime(data_string, formato)
     ano = data_objeto.year
 
     return ano
 # ==================================
 def retorna_mes_data(data_string):
-    from datetime import datetime
-
     formato = "%b %d, %Y, %I:%M:%S %p"  # Formato da sua string de data
-
     data_objeto = datetime.strptime(data_string, formato)
     mes = data_objeto.month
 
     return mes
+# ==================================
+def retorna_dia_semana_data(data_string):
+    formato = "%b %d, %Y, %I:%M:%S %p"  # Formato da sua string de data
+    data_objeto = datetime.strptime(data_string, formato)
+    dia_semana = data_objeto.day
+
+    return dia_semana
+# ==================================
+def retorna_dia_da_semana(data_string):
+    """
+    Recebe uma string de data no formato "Jan 6, 2025, 11:12:46 PM"
+    e retorna o dia da semana.
+    """
+    try:
+        data = datetime.strptime(data_string, "%b %d, %Y, %I:%M:%S %p")
+
+        dias_da_semana = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo']
+        dia_da_semana_numero = data.weekday()
+        return dias_da_semana[dia_da_semana_numero]
+    except ValueError:
+        return "Formato de data inválido. Use 'Jan 6, 2025, 11:12:46 PM'."
+
 # ==================================
 def retorna_atividades_mes_ano(df2, ano, mes):
     df_lista_mes_ano = df2[(df2['data_ano'] == int(ano)) & (df2['data_mes'] == int(mes)) ]
@@ -82,4 +99,3 @@ def retorna_atividades_df_por_mes(df2):
 
     return lista_dfs_mes    
 # ==================================
-

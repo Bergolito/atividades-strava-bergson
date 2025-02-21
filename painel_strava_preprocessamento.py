@@ -2,6 +2,7 @@
 # Imports
 # =======================================================
 import pandas as pd
+from datetime import datetime
 
 from painel_strava_funcoes import *
 
@@ -16,6 +17,7 @@ def salvar_arquivos_atividades_completos_anos():
   df2 = df_atividades_todos.copy()
   df2['data_ano'] = df_atividades_todos['Activity Date'].apply(retorna_ano_data)
   df2['data_mes'] = df_atividades_todos['Activity Date'].apply(retorna_mes_data)
+  df2['dia_semana'] = df_atividades_todos['Activity Date'].apply(retorna_dia_da_semana)
   df2['tempo_min'] = df_atividades_todos['Elapsed Time'].apply(calcula_tempo_atv_minutos)
 
   lista_anos = df2['data_ano'].unique()
@@ -36,10 +38,6 @@ def salvar_arquivos_atividades_completos_anos():
 
   df2.drop(lista_colunas_dropar_01, axis=1, inplace=True)
   df2.drop(lista_colunas_dropar_02, axis=1, inplace=True)
-
-  # Supondo que seu DataFrame seja chamado 'df'
-  #colunas_com_nan = df2.columns[df2.isnull().any()].tolist()
-  #print(f'Colunas com campos nulos => {colunas_com_nan}')
 
   nome_arquivo = f'datasets/atividades_fisicas_todos.csv'
   print(f'Gerado arquivo de atvs fisicas => {nome_arquivo}...')
@@ -127,7 +125,6 @@ def salvar_arquivos_somatorios_anos():
         dados = {coluna: [] for coluna in colunas}
 
         # Cria o DataFrame vazio
-        #df_novo = pd.DataFrame(dados, dtype={'ano': 'int64', 'mes': 'int64', 'Distance': 'float64', 'tempo_min': 'float64', 'Calories': 'float64'})
         df_novo = pd.DataFrame(dados)
         df_concatenados = pd.DataFrame(dados)
 
@@ -148,27 +145,8 @@ def salvar_arquivos_somatorios_anos():
         df_concatenados.to_csv(nome_arquivo)
 
 # ==================================
-def teste():
-    import pandas as pd
-
-    # Cria um DataFrame de exemplo
-    data = {'Nome': ['Alice', 'Bob'], 'Idade': [25, 30]}
-    df = pd.DataFrame(data)
-
-    # Cria um dicionário com os dados da nova linha
-    nova_linha = {'Nome': 'Carol', 'Idade': 28}
-
-    # Converte o dicionário em uma Series
-    nova_serie = pd.Series(nova_linha)
-
-    # Adiciona a Series ao DataFrame
-    df = pd.concat([df, nova_serie.to_frame().T], ignore_index=True)
-    df.to_csv('datasets/teste.csv')
-    print(df)
-# ==================================
-   
 
 salvar_arquivos_atividades_completos_anos()
 salvar_arquivos_atividades_simplificados_anos()
 salvar_arquivos_somatorios_anos()
-#teste()
+

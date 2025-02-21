@@ -36,15 +36,27 @@ def gera_dados_gerais():
   # gera dados dos tipos de atividades
   gera_dados_gerais_tipo_atividades()
 
+  # gera dados dos dias da semana 
+  gera_dados_gerais_dia_semana_atividades()
+
 # =======================================================
 def gera_dados_gerais_tipo_atividades():
 
-  processa_acidentes_geral_tipo()
+  processa_atividades_geral_tipo_ano_mes()
+  processa_atividades_geral_tipo_ano_mes()
 
 # =======================================================
+def gera_dados_gerais_dia_semana_atividades():
+
+  processa_atividades_geral_dia_semana_ano()
+  processa_atividades_geral_dia_semana_ano_mes()
+# =======================================================
+
+
 
 # =======================================================
 # main 
 # =======================================================
+
 gera_dados_gerais()
 
