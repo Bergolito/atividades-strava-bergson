@@ -1,0 +1,7 @@
+pandas
+geopandas
+numpy
+streamlit
+altair
+altair_saver
+vega_datasets
