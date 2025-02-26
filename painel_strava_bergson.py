@@ -26,6 +26,7 @@ df_atividades_simplificado_2023 = pd.read_csv('datasets/atividades_fisicas_simpl
 df_atividades_simplificado_2024 = pd.read_csv('datasets/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="UTF-8")
 df_atividades_simplificado_2025 = pd.read_csv('datasets/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
 
+df_sumario_2024 = pd.read_csv('datasets/gerais/sumario_atividades_2024.csv', sep=',', encoding="UTF-8")
 
 df_atvs_tipo_todos = pd.read_csv('datasets/gerais/atividades_geral_por_tipo.csv', sep=',', encoding="UTF-8")
 df_atvs_dia_semana_todos = pd.read_csv('datasets/gerais/atividades_geral_por_dia_semana.csv', sep=',', encoding="UTF-8")
@@ -165,7 +166,28 @@ with tab_01:
 
     titulo = f'Atividades Físicas em {ano_selecionado1}'
     df_filtro = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
-    st.table(df_filtro)
+    
+    df_filtro2 = df_filtro.copy()
+    index_linha1 = df_filtro2.shape[0]+1
+    df_filtro2.loc[index_linha1,'tipo_atividade']='TOTAL'
+    total = df_filtro2['qtd'].sum()
+    df_filtro2.loc[index_linha1,'qtd']=total
+    df_filtro2.loc[index_linha1,'ano']=''
+
+    html_table1 = df_filtro2.to_html(index=False) # index=False remove a coluna de índice
+    st.write(html_table1, unsafe_allow_html=True)
+
+    index_linha2 = df_sumario_2024.shape[0]+1
+    df_sumario_2024.loc[index_linha2,'mes']='TOTAL'
+    total_qtd = df_sumario_2024['qtd'].sum()
+    total_distancia = df_sumario_2024['distancia'].sum()
+    total_caloria = df_sumario_2024['calorias'].sum()
+    df_sumario_2024.loc[index_linha2,'qtd']=total
+    df_sumario_2024.loc[index_linha2,'distancia']=total_distancia
+    df_sumario_2024.loc[index_linha2,'calorias']=total_caloria
+
+    html_table2 = df_sumario_2024.to_html(index=False) # index=False remove a coluna de índice
+    st.write(html_table2, unsafe_allow_html=True)
 
     grafico_pizza = grafico_pizza_tipo_atv(df_filtro)
     st.altair_chart(grafico_pizza, use_container_width=False)
@@ -187,8 +209,11 @@ with tab_02:
         nome_mes = obter_mes_por_numero(mes)
         titulo = f'Atividades Físicas em {nome_mes} de {ano_selecionado1}'
         df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df_selecionado, ano_selecionado1, mes)
+
         st.write(titulo) 
-        st.table(df_filtro)
+        html_table1 = df_filtro.to_html(index=False) # index=False remove a coluna de índice
+        st.write(html_table1, unsafe_allow_html=True)
+
         grafico_ano_mes = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
         st.altair_chart(grafico_ano_mes, use_container_width=False)
 

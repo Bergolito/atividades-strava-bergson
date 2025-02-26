@@ -1,8 +1,6 @@
 # =======================================================
 # Imports
 # =======================================================
-import pandas as pd
-import streamlit as st
 from datetime import datetime
 
 # ==================================
@@ -79,8 +77,8 @@ def obter_mes_por_numero(numero):
       "Setembro", "Outubro", "Novembro", "Dezembro"
   ]
 
-  if 0 <= numero <= 11:
-    return meses[numero]
+  if 1 <= numero <= 12:
+    return meses[numero-1]
   else:
     return None  # Número inválido
 # ==================================
