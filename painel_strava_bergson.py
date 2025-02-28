@@ -359,5 +359,5 @@ with tab_07:
 
         with col3:
             st.write("Coluna 3")
-            html_table_estatistica = df_ano_estatistica.to_html(index=False) 
-            st.write(html_table_estatistica, unsafe_allow_html=True)
+            #html_table_estatistica = df_ano_estatistica.to_html(index=False) 
+            #st.write(html_table_estatistica, unsafe_allow_html=True)
