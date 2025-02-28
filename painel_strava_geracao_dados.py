@@ -68,13 +68,11 @@ def gera_sumario_atividades_por_ano(df, ano):
     df_sumario.loc[0,'calorias'] = calorias
 
     print(f'df_sumario => {df_sumario.shape}')
-    df_sumario_geral = pd.concat([df_sumario_geral, df_sumario])
+    df_sumario_geral = pd.concat([df_sumario_geral, df_sumario], ignore_index=True)
 
   print(f'df_sumario_geral => {df_sumario_geral.shape[0]}')
 
-  df_sumario_geral2 = df_sumario_geral.reset_index(drop=True)
-
-  return df_sumario_geral2
+  return df_sumario_geral
 # =======================================================
 
 def gera_sumarios_anos():

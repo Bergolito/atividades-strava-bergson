@@ -52,6 +52,23 @@ def gera_grafico_barras_tipo_exercicio(df_filtro, titulo):
 
     return grafico    
 # =======================================================
+def gera_grafico_barras_atividades_mes(df_filtro, titulo):
+
+    grafico = alt.Chart(df_filtro).mark_bar().encode(
+        x=alt.X('mes:N', title='Mês'),
+        y=alt.Y('qtd:Q', title='Quantidade de Atividades'),
+        tooltip=['mes', 'qtd'],      
+        color=alt.Color('mes:N', title='Mês')     
+    ).properties(
+        title=alt.Title(
+            text=titulo
+        ),
+        width=700,
+        height=500
+    ).interactive()
+
+    return grafico    
+# =======================================================
 
 # =======================================================
 # Gráficos de Fluxo
