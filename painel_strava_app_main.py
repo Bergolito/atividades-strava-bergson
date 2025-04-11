@@ -41,7 +41,30 @@ df_sumario_atvs_2025 = pd.read_csv('datasets/gerais/sumario_atividades_2025.csv'
 # =======================================================
 # Constantes do dashboard
 # =======================================================
-#OPCAO_TODOS = 'Todos'
+
+# CSS para estilizar a tabela
+css = """
+<style>
+.estilo_tabela {
+width: 100%;
+border-collapse: collapse;
+}
+.estilo_tabela th, .estilo_tabela td {
+border: 1px solid #ddd;
+padding: 8px;
+text-align: left;
+}
+.estilo_tabela th {
+background-color: #f2f2f2;
+font-weight: bold;
+}
+.estilo_tabela tr:nth-child(even) {
+background-color: #f9f9f9;
+}
+</style>
+"""
+
+OPCAO_TODOS = 'Todos'
 OPCAO_NONE = None
 COLUNA_ANO = 'ano'
 
@@ -90,7 +113,7 @@ with st.sidebar:
 
         ano_selecionado = st.sidebar.selectbox(
             'Qual o ano deseja visualizar?',
-            ('Todos','2025','2024', '2023', '2022', '2021', '2020'), index=1,
+            (OPCAO_TODOS,'2025','2024', '2023', '2022', '2021', '2020'), index=1,
             key="ano_selecionado"
         )
 
@@ -123,7 +146,7 @@ if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-primeira_aba, tab_01, tab_02, tab_03, tab_04, tab_05, tab_06 = st.tabs(
+primeira_aba, tab_01, tab_02, tab_03, tab_04, tab_05, tab_06, tab_teste_html = st.tabs(
   [
     "Atividades em Geral",
     "Atividades por Critérios",
@@ -132,6 +155,7 @@ primeira_aba, tab_01, tab_02, tab_03, tab_04, tab_05, tab_06 = st.tabs(
     "Atividades por Barras Empilhadas",
     "Atividades por Fluxo",
     "Atividades por Mapa de Calor",
+    "tabela html"
   ]
 )
 
@@ -240,7 +264,8 @@ with primeira_aba:
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown(f'<h2> {item[1]} </h2>', unsafe_allow_html=True)  
-            html_table_ano = df_ano.to_html(index=False) 
+            html_table_ano = df_ano.to_html(classes='estilo_tabela', index=False) 
+            st.markdown(css, unsafe_allow_html=True)
             st.write(html_table_ano, unsafe_allow_html=True)
 
         with col2:
@@ -265,7 +290,7 @@ with tab_01:
     df_filtro2.loc[index_linha1,'qtd']=total
     df_filtro2.loc[index_linha1,'ano']=''
 
-    html_table1 = df_filtro2.to_html(index=False) # index=False remove a coluna de índice
+    html_table1 = df_filtro2.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
     st.write(html_table1, unsafe_allow_html=True)
 
     index_linha2 = df_sumario_2024.shape[0]+1
@@ -277,7 +302,7 @@ with tab_01:
     df_sumario_2024.loc[index_linha2,'distancia']=total_distancia
     df_sumario_2024.loc[index_linha2,'calorias']=total_caloria
 
-    html_table2 = df_sumario_2024.to_html(index=False) # index=False remove a coluna de índice
+    html_table2 = df_sumario_2024.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
     st.write(html_table2, unsafe_allow_html=True)
 
     grafico_pizza = grafico_pizza_tipo_atv(df_filtro)
@@ -302,7 +327,7 @@ with tab_02:
         df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df_selecionado, ano_selecionado1, mes)
 
         st.write(titulo) 
-        html_table1 = df_filtro.to_html(index=False) # index=False remove a coluna de índice
+        html_table1 = df_filtro.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
         st.write(html_table1, unsafe_allow_html=True)
 
         grafico_ano_mes = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
@@ -377,3 +402,19 @@ with tab_06:
     st.altair_chart(grafico_mapa_calor_02, use_container_width=False)
 
 # ==============================================================================
+with tab_teste_html:
+    import streamlit as st
+    import pandas as pd
+
+    # Dados
+    data = {'Nome': ['Alice', 'Bob', 'Charlie'],
+            'Idade': [25, 30, 22],
+            'Cidade': ['Recife', 'Olinda', 'Jaboatão']}
+    df = pd.DataFrame(data)
+
+    # Converter DataFrame para HTML com classe CSS
+    html_table = df.to_html(classes='estilo_tabela', index=False)
+
+    # Exibir o CSS e a tabela HTML no Streamlit
+    st.markdown(css, unsafe_allow_html=True)
+    st.markdown(html_table, unsafe_allow_html=True)
