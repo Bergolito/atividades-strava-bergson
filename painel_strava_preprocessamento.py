@@ -168,8 +168,27 @@ def compactar_pasta(pasta_origem, nome_base):
 
     print(f"Pasta '{pasta_origem}' compactada com sucesso em '{caminho_arquivo_zip}'")
 # ==================================
-#compactar_pasta("datasets", "bkp_datasets")
-salvar_arquivos_atividades_completos_anos()
-salvar_arquivos_atividades_simplificados_anos()
-salvar_arquivos_somatorios_anos()
 
+# ==================================
+# ATENÇÂO
+# ==================================
+
+# ==================================
+# Antes de executar o código, executar o passo de compactar a pasta datasets
+# 1. Compactar a pasta datasets
+# 2. Salvar os arquivos de atividades completos por ano
+# ==================================
+#compactar_pasta("datasets", "bkp_datasets")
+
+# ==================================
+def executa_preprocessamento_dados():
+  salvar_arquivos_atividades_completos_anos()
+  salvar_arquivos_atividades_simplificados_anos()
+  salvar_arquivos_somatorios_anos()
+# ==================================
+
+# ==================================
+if __name__ == "__main__":
+  # Executa o código
+  executa_preprocessamento_dados()
+# ==================================  

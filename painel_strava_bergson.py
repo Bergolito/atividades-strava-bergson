@@ -172,9 +172,6 @@ with primeira_aba:
     titulo = f'Lista de Atividades (Geral)'
     st.markdown(titulo, unsafe_allow_html=True)  
 
-    #print(f'Ano Selecionado = {ano_selecionado}')
-    #st.markdown(f'Ano Selecionado = {ano_selecionado}', unsafe_allow_html=True)  
-
     lista_dfs_ano = [
         (df_sumario_atvs_2020, 2020),
         (df_sumario_atvs_2021, 2021),
