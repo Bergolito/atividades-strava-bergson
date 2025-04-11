@@ -90,7 +90,7 @@ with st.sidebar:
 
         ano_selecionado = st.sidebar.selectbox(
             'Qual o ano deseja visualizar?',
-            ('2025','2024', '2023', '2022', '2021', '2020'), index=1,
+            ('Todos','2025','2024', '2023', '2022', '2021', '2020'), index=1,
             key="ano_selecionado"
         )
 
@@ -125,7 +125,7 @@ if 'ano_selecionado' not in st.session_state:
 # Definição de abas
 primeira_aba, tab_01, tab_02, tab_03, tab_04, tab_05, tab_06 = st.tabs(
   [
-    "Atividades em Geral",  
+    "Atividades em Geral",
     "Atividades por Critérios",
     "Atividades Físicas 02",
     "Atividades por Ranking",
@@ -167,11 +167,13 @@ else:
         df_selecionado = df_atividades_simplificado_2025    
 
 # ==============================================================================
-
 with primeira_aba:
 
-    titulo = f'Geral'
+    titulo = f'Lista de Atividades (Geral)'
     st.markdown(titulo, unsafe_allow_html=True)  
+
+    #print(f'Ano Selecionado = {ano_selecionado}')
+    #st.markdown(f'Ano Selecionado = {ano_selecionado}', unsafe_allow_html=True)  
 
     lista_dfs_ano = [
         (df_sumario_atvs_2020, 2020),
@@ -181,9 +183,26 @@ with primeira_aba:
         (df_sumario_atvs_2024, 2024),
         (df_sumario_atvs_2025, 2025),
     ]
+    # ordena os registros pelo ano
     lista_dfs_ano.sort(key=lambda x: x[1], reverse=True)
 
-    for item in lista_dfs_ano:
+    lista_registros = []
+    if ano_selecionado == 'Todos':
+        lista_registros = lista_dfs_ano
+    elif ano_selecionado == '2020':
+        lista_registros.append((df_sumario_atvs_2020, 2020))
+    elif ano_selecionado == '2021':
+        lista_registros.append((df_sumario_atvs_2021, 2021))
+    elif ano_selecionado == '2022':
+        lista_registros.append((df_sumario_atvs_2022, 2022))
+    elif ano_selecionado == '2023':
+        lista_registros.append((df_sumario_atvs_2023, 2023))
+    elif ano_selecionado == '2024':
+        lista_registros.append((df_sumario_atvs_2024, 2024))
+    elif ano_selecionado == '2025':
+        lista_registros.append((df_sumario_atvs_2025, 2025))        
+
+    for item in lista_registros:
         df = item[0].copy()
         df_ano = df.drop(columns=["Unnamed: 0","ano"])
         df_ano['qtd'] = df_ano['qtd'].astype(int)
@@ -223,19 +242,12 @@ with primeira_aba:
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.write("Coluna 1")
             st.markdown(f'<h2> {item[1]} </h2>', unsafe_allow_html=True)  
             html_table_ano = df_ano.to_html(index=False) 
             st.write(html_table_ano, unsafe_allow_html=True)
 
         with col2:
-            st.write("Coluna 2")
             st.altair_chart(grafico_atividades_ano_mes, use_container_width=False)
-
-        with col3:
-            st.write("Coluna 3")
-            #html_table_estatistica = df_ano_estatistica.to_html(index=False) 
-            #st.write(html_table_estatistica, unsafe_allow_html=True)
 
 # ==============================================================================
 with tab_01:
@@ -368,71 +380,3 @@ with tab_06:
     st.altair_chart(grafico_mapa_calor_02, use_container_width=False)
 
 # ==============================================================================
-with tab_07:
-
-    titulo = f'Geral'
-    st.markdown(titulo, unsafe_allow_html=True)  
-
-    lista_dfs_ano = [
-        (df_sumario_atvs_2020, 2020),
-        (df_sumario_atvs_2021, 2021),
-        (df_sumario_atvs_2022, 2022),
-        (df_sumario_atvs_2023, 2023),
-        (df_sumario_atvs_2024, 2024),
-        (df_sumario_atvs_2025, 2025),
-    ]
-    lista_dfs_ano.sort(key=lambda x: x[1], reverse=True)
-
-    for item in lista_dfs_ano:
-        df = item[0].copy()
-        df_ano = df.drop(columns=["Unnamed: 0","ano"])
-        df_ano['qtd'] = df_ano['qtd'].astype(int)
-        df_ano['mes'] = df_ano['mes'].apply(obter_mes_por_numero)
-        df_ano['calorias'] = df_ano['calorias'].round(2)
-
-        df_ano_grafico = df_ano.copy()
-        titulo = f'Atividades Físicas em {item[1]}'
-        grafico_atividades_ano_mes = gera_grafico_barras_atividades_mes(df_ano_grafico, titulo)
-
-        qtd = df_ano['qtd'].sum()
-        distancia = df_ano['distancia'].sum()
-        calorias = df_ano['calorias'].sum()
-        print(f'qtd => {qtd} | distancia =>  {distancia} | calorias => {calorias}')
-
-        df_ano_estatistica = pd.DataFrame(columns=['criterio','qtd','distancia','calorias'])
-        df_ano_estatistica.loc[0, 'criterio'] = 'Mínimo'
-        df_ano_estatistica.loc[0, 'qtd'] = df_ano['qtd'].min()
-        df_ano_estatistica.loc[0, 'distancia'] = df_ano['distancia'].min()
-        df_ano_estatistica.loc[0, 'calorias'] = df_ano['calorias'].min()
-
-        df_ano_estatistica.loc[1, 'criterio'] = 'Máximo'
-        df_ano_estatistica.loc[1, 'qtd'] = df_ano['qtd'].max()
-        df_ano_estatistica.loc[1, 'distancia'] = df_ano['distancia'].max()
-        df_ano_estatistica.loc[1, 'calorias'] = df_ano['calorias'].max()        
-
-        df_ano_estatistica.loc[2, 'criterio'] = 'Média'
-        df_ano_estatistica.loc[2, 'qtd'] = df_ano['qtd'].mean()
-        df_ano_estatistica.loc[2, 'distancia'] = df_ano['distancia'].mean()
-        df_ano_estatistica.loc[2, 'calorias'] = df_ano['calorias'].mean()                
-
-        index = df_ano.shape[0]+1
-        df_ano.loc[index,'mes'] = 'TOTAL'
-        df_ano.loc[index,'qtd'] = qtd
-        df_ano.loc[index,'distancia'] = distancia
-        df_ano.loc[index,'calorias'] = calorias
-
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.write("Coluna 1")
-            st.markdown(f'<h2> {item[1]} </h2>', unsafe_allow_html=True)  
-            html_table_ano = df_ano.to_html(index=False) 
-            st.write(html_table_ano, unsafe_allow_html=True)
-
-        with col2:
-            st.write("Coluna 2")
-            st.altair_chart(grafico_atividades_ano_mes, use_container_width=False)
-
-        with col3:
-            st.write("Coluna 3")
-            #html_table_estatistica = df_ano_estatistica.to_html(index=False) 
-            #st.write(html_table_estatistica, unsafe_allow_html=True)
