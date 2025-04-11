@@ -2,8 +2,10 @@
 # Imports
 # =======================================================
 import pandas as pd
-from datetime import datetime
+import zipfile
+import os
 
+from datetime import datetime
 from painel_strava_funcoes import *
 
 # ==================================
@@ -39,26 +41,26 @@ def salvar_arquivos_atividades_completos_anos():
   df2.drop(lista_colunas_dropar_01, axis=1, inplace=True)
   df2.drop(lista_colunas_dropar_02, axis=1, inplace=True)
 
-  nome_arquivo = f'datasets/atividades_fisicas_todos.csv'
+  nome_arquivo = f'datasets/predados/atividades_fisicas_todos.csv'
   print(f'Gerado arquivo de atvs fisicas => {nome_arquivo}...')
   df2.to_csv(nome_arquivo)
 
   for ano in lista_anos:
     df_atvs_ano = retorna_atividades_ano(df2, ano)
-    nome_arquivo = f'datasets/atividades_fisicas_{ano}.csv'
+    nome_arquivo = f'datasets/predados/atividades_fisicas_{ano}.csv'
     print(f'Gerado arquivo de atvs fisicas => {nome_arquivo}...')
     df_atvs_ano.to_csv(nome_arquivo)
 # ==================================
 def salvar_arquivos_atividades_simplificados_anos():
   
   lista_dfs_anos = []
-  df_atividades_2020 = pd.read_csv('datasets/atividades_fisicas_2020.csv', sep=',', encoding="ISO-8859-1")
-  df_atividades_2021 = pd.read_csv('datasets/atividades_fisicas_2021.csv', sep=',', encoding="ISO-8859-1")
-  df_atividades_2022 = pd.read_csv('datasets/atividades_fisicas_2022.csv', sep=',', encoding="ISO-8859-1")
-  df_atividades_2023 = pd.read_csv('datasets/atividades_fisicas_2023.csv', sep=',', encoding="ISO-8859-1")
-  df_atividades_2024 = pd.read_csv('datasets/atividades_fisicas_2024.csv', sep=',', encoding="ISO-8859-1")
-  df_atividades_2025 = pd.read_csv('datasets/atividades_fisicas_2025.csv', sep=',', encoding="ISO-8859-1")
-  df_atividades_todos = pd.read_csv('datasets/atividades_fisicas_todos.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2020 = pd.read_csv('datasets/predados/atividades_fisicas_2020.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2021 = pd.read_csv('datasets/predados/atividades_fisicas_2021.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2022 = pd.read_csv('datasets/predados/atividades_fisicas_2022.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2023 = pd.read_csv('datasets/predados/atividades_fisicas_2023.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2024 = pd.read_csv('datasets/predados/atividades_fisicas_2024.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2025 = pd.read_csv('datasets/predados/atividades_fisicas_2025.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_todos = pd.read_csv('datasets/predados/atividades_fisicas_todos.csv', sep=',', encoding="ISO-8859-1")
 
   lista_dfs_anos = [
     (2020,df_atividades_2020),
@@ -69,7 +71,7 @@ def salvar_arquivos_atividades_simplificados_anos():
     (2025,df_atividades_2025)
   ] 
 
-  nome_arquivo = f'datasets/atividades_fisicas_simplificado_todos.csv'
+  nome_arquivo = f'datasets/predados/atividades_fisicas_simplificado_todos.csv'
   print(f'Gerado arquivo de atvs fisicas => {nome_arquivo}...')
   lista_colunas_dropar_03 = [
     'Relative Effort',	'Commute',	'Activity Private Note',	'Activity Gear',	'Filename',	'Athlete Weight',	'Bike Weight',	
@@ -89,7 +91,7 @@ def salvar_arquivos_atividades_simplificados_anos():
     df_atividades_ano = item[1]
     # Supondo que seu DataFrame seja chamado 'df'
     df_atvs_ano = retorna_atividades_ano(df_atividades_ano, ano)
-    nome_arquivo = f'datasets/atividades_fisicas_simplificado_{ano}.csv'
+    nome_arquivo = f'datasets/predados/atividades_fisicas_simplificado_{ano}.csv'
     print(f'Gerado arquivo de atvs fisicas simplificado => {nome_arquivo}...')
     df_atvs_ano.drop(lista_colunas_dropar_03, axis=1, inplace=True)
     df_atvs_ano.to_csv(nome_arquivo)
@@ -98,12 +100,12 @@ def salvar_arquivos_atividades_simplificados_anos():
 # ==================================
 def salvar_arquivos_somatorios_anos():
   
-    df_atividades_2020 = pd.read_csv('datasets/atividades_fisicas_simplificado_2020.csv', sep=',', encoding="ISO-8859-1")
-    df_atividades_2021 = pd.read_csv('datasets/atividades_fisicas_simplificado_2021.csv', sep=',', encoding="ISO-8859-1")
-    df_atividades_2022 = pd.read_csv('datasets/atividades_fisicas_simplificado_2022.csv', sep=',', encoding="ISO-8859-1")
-    df_atividades_2023 = pd.read_csv('datasets/atividades_fisicas_simplificado_2023.csv', sep=',', encoding="ISO-8859-1")
-    df_atividades_2024 = pd.read_csv('datasets/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="ISO-8859-1")
-    df_atividades_2025 = pd.read_csv('datasets/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2020 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2020.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2021 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2021.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2022 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2022.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2023 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2023.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2024 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2025 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
 
     lista_dfs_anos = [
         (2020,df_atividades_2020),
@@ -128,7 +130,7 @@ def salvar_arquivos_somatorios_anos():
         df_novo = pd.DataFrame(dados)
         df_concatenados = pd.DataFrame(dados)
 
-        nome_arquivo = f'datasets/atividades_fisicas_somatorio_{ano}.csv'
+        nome_arquivo = f'datasets/predados/atividades_fisicas_somatorio_{ano}.csv'
         indice = 0
         for mes in range(0, 12):
 
@@ -145,7 +147,28 @@ def salvar_arquivos_somatorios_anos():
         df_concatenados.to_csv(nome_arquivo)
 
 # ==================================
+def compactar_pasta(pasta_origem, nome_base):
+    """
+    Compacta uma pasta em um arquivo ZIP com o nome contendo uma base e a data atual.
 
+    Args:
+        pasta_origem (str): O caminho da pasta a ser compactada.
+        nome_base (str): A parte base do nome do arquivo ZIP.
+    """
+    data_atual = datetime.now().strftime("%Y-%m-%d")
+    nome_arquivo_zip = f"{nome_base}-{data_atual}.zip"
+    caminho_arquivo_zip = os.path.join(os.getcwd(), nome_arquivo_zip)  # Salva na pasta atual
+
+    with zipfile.ZipFile(caminho_arquivo_zip, 'w', zipfile.ZIP_DEFLATED) as arquivo_zip:
+        for pasta_raiz, subpastas, arquivos in os.walk(pasta_origem):
+            for arquivo in arquivos:
+                caminho_completo = os.path.join(pasta_raiz, arquivo)
+                caminho_relativo = os.path.relpath(caminho_completo, pasta_origem)
+                arquivo_zip.write(caminho_completo, caminho_relativo)
+
+    print(f"Pasta '{pasta_origem}' compactada com sucesso em '{caminho_arquivo_zip}'")
+# ==================================
+#compactar_pasta("datasets", "bkp_datasets")
 salvar_arquivos_atividades_completos_anos()
 salvar_arquivos_atividades_simplificados_anos()
 salvar_arquivos_somatorios_anos()
