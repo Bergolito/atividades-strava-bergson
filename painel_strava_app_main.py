@@ -3,6 +3,8 @@
 # =======================================================
 import pandas as pd
 import streamlit as st
+import folium
+from streamlit_folium import folium_static
 
 from painel_strava_funcoes import *
 from painel_strava_graficos import *
@@ -146,27 +148,33 @@ if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-primeira_aba, tab_01, tab_02, tab_03, tab_04, tab_05, tab_06, tab_teste_html = st.tabs(
+primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_mapas, tab_detalhamento, tab_mapas_02 = st.tabs(
   [
     "Atividades em Geral",
-    "Atividades por Critérios",
-    "Atividades Físicas 02",
+    "Atividades por Tipo",
+    "Atividades Físicas por ano e mês",
     "Atividades por Ranking",
     "Atividades por Barras Empilhadas",
     "Atividades por Fluxo",
     "Atividades por Mapa de Calor",
-    "tabela html"
+    "Mapas",
+    "Detalhamento das Atividades",
+    "Mapas NOVO 02",
   ]
 )
 
 # filtro
 df_selecionado = df_atividades_simplificado_2024
-ano_selecionado1 = 2024
+ano_selecionado1 = 2025
 if st.session_state.ano_selecionado is None:
     df_selecionado = df_atividades_simplificado_2024
 else:
 
-    if st.session_state.ano_selecionado == '2020':
+    if st.session_state.ano_selecionado == 'Todos':
+        ano_selecionado1 = 'Todos'
+        df_selecionado = df_atividades_simplificado_todos
+
+    elif st.session_state.ano_selecionado == '2020':
         ano_selecionado1 = 2020
         df_selecionado = df_atividades_simplificado_2020
 
@@ -189,6 +197,79 @@ else:
     elif st.session_state.ano_selecionado == '2025':
         ano_selecionado1 = 2025
         df_selecionado = df_atividades_simplificado_2025    
+
+# ==============================================================================
+# Funções
+# ==============================================================================
+
+    # =======================================================
+    # aba Mapas
+    def exibe_mapa_coordenadas(nome_arquivo):
+        import gpxpy
+        import gpxpy.gpx
+
+        try:
+            # Carregar o arquivo de rotas
+            route_df = pd.read_csv(f'datasets/mapas/{nome_arquivo}', sep=',')
+            
+            if route_df.empty:
+                st.warning("O arquivo de rotas está vazio. Não há dados para exibir no mapa.")
+            else:
+                # Verificar se o arquivo tem as colunas necessárias
+                required_columns = ['latitude', 'longitude']
+                
+                if all(col in route_df.columns for col in required_columns):
+                    # Criar um mapa centrado na média das coordenadas
+                    lat_medio = route_df['latitude'].mean()
+                    lon_medio = route_df['longitude'].mean()
+                    
+                    m = folium.Map(location=[lat_medio, lon_medio], zoom_start=14)
+                    
+                    # Adicionar marcadores para cada ponto ou desenhar linha conectando os pontos
+                    points = list(zip(route_df['latitude'], route_df['longitude']))
+                    
+                    # Adicionar uma linha conectando os pontos (traçar a rota)
+                    folium.PolyLine(
+                        points,
+                        weight=5,
+                        color='blue',
+                        opacity=0.7
+                    ).add_to(m)
+                    
+                    # Adicionar marcadores para o início e o fim da rota
+                    folium.Marker(
+                        location=[route_df['latitude'].iloc[0], route_df['longitude'].iloc[0]],
+                        popup='Início',
+                        icon=folium.Icon(color='green')
+                    ).add_to(m)
+                    
+                    folium.Marker(
+                        location=[route_df['latitude'].iloc[-1], route_df['longitude'].iloc[-1]],
+                        popup='Fim',
+                        icon=folium.Icon(color='red')
+                    ).add_to(m)
+                    
+                    # Exibir o mapa
+                    st.subheader("Mapa da Rota")
+                    folium_static(m)
+                    
+                    # Mostrar estatísticas da rota, se disponíveis
+                    if 'distance' in route_df.columns:
+                        total_distance = route_df['distance'].sum() / 1000  # Convertendo para km, se em metros
+                        st.metric("Distância Total", f"{total_distance:.2f} km")
+                    
+                    # Mostrar tabela com as primeiras linhas das coordenadas
+                    st.subheader("Amostra dos dados de coordenadas")
+                    st.dataframe(route_df.head(10))
+                    
+                else:
+                    st.error(f"O arquivo de rotas não contém as colunas necessárias: {required_columns}")
+                    st.write("Colunas disponíveis:", list(route_df.columns))
+        
+        except FileNotFoundError:
+            st.error("Arquivo de rotas não encontrado. Verifique se o arquivo 'abc' existe.")
+        except Exception as e:
+            st.error(f"Erro ao carregar o arquivo de rotas: {str(e)}")
 
 # ==============================================================================
 with primeira_aba:
@@ -261,7 +342,7 @@ with primeira_aba:
         df_ano.loc[index,'distancia'] = distancia
         df_ano.loc[index,'calorias'] = calorias
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         with col1:
             st.markdown(f'<h2> {item[1]} </h2>', unsafe_allow_html=True)  
             html_table_ano = df_ano.to_html(classes='estilo_tabela', index=False) 
@@ -272,7 +353,7 @@ with primeira_aba:
             st.altair_chart(grafico_atividades_ano_mes, use_container_width=False)
 
 # ==============================================================================
-with tab_01:
+with segunda_aba:
 
     # =======================================================
     # aba 01
@@ -281,8 +362,12 @@ with tab_01:
     st.markdown(titulo, unsafe_allow_html=True)  
 
     titulo = f'Atividades Físicas em {ano_selecionado1}'
-    df_filtro = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
-    
+    st.write(f' Ano selecionado => {ano_selecionado1}') 
+    if ano_selecionado1 != 'Todos':
+        df_filtro = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
+    elif ano_selecionado1 == 'Todos':
+        df_filtro = df_atvs_tipo_todos
+
     df_filtro2 = df_filtro.copy()
     index_linha1 = df_filtro2.shape[0]+1
     df_filtro2.loc[index_linha1,'tipo_atividade']='TOTAL'
@@ -312,18 +397,17 @@ with tab_01:
     st.altair_chart(grafico_ano, use_container_width=False)
 
 # ==============================================================================
-with tab_02:
+with terceira_aba:
 
     # =======================================================
-    # aba 02
+    # terceira_aba
     # =======================================================
     titulo = f'<h3> Atividades Físicas'
     st.markdown(titulo, unsafe_allow_html=True)  
 
-    for mes in range(1, 13):
-        print(f'ano => {ano_selecionado1} | mes => {mes}')
+    def gera_grafico_barras_mes(mes):
         nome_mes = obter_mes_por_numero(mes)
-        titulo = f'Atividades Físicas em {nome_mes} de {ano_selecionado1}'
+        titulo = f'{nome_mes} de {ano_selecionado1}'
         df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df_selecionado, ano_selecionado1, mes)
 
         st.write(titulo) 
@@ -333,6 +417,20 @@ with tab_02:
         grafico_ano_mes = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
         st.altair_chart(grafico_ano_mes, use_container_width=False)
 
+    if ano_selecionado1 != 'Todos':
+        col1, col2 = st.columns(2)
+        with col1:
+            # De Janeiro a Junho
+            for mes in range(1, 6):
+                gera_grafico_barras_mes(mes)
+
+        with col2:    
+
+            # De Julho a Dezembro
+            for mes in range(7, 12):
+                gera_grafico_barras_mes(mes)
+    else:
+        st.write("Esta funcionalidade não está disponível para a opção 'Todos'", unsafe_allow_html=True)
 # ==============================================================================
 with tab_03:
 
@@ -402,19 +500,317 @@ with tab_06:
     st.altair_chart(grafico_mapa_calor_02, use_container_width=False)
 
 # ==============================================================================
-with tab_teste_html:
-    import streamlit as st
-    import pandas as pd
+with tab_mapas:
+    # =======================================================
+    # aba Mapas
+    # =======================================================
+    titulo = f'<h3>Mapas de Rotas</h3>'
+    st.markdown(titulo, unsafe_allow_html=True)
+    
+    try:
+        # Carregar o arquivo de rotas
+        #8178949214.csv
+        route_df = pd.read_csv('datasets/mapas/8178949214.csv', sep=',')
+        
+        if route_df.empty:
+            st.warning("O arquivo de rotas está vazio. Não há dados para exibir no mapa.")
+        else:
+            # Verificar se o arquivo tem as colunas necessárias
+            required_columns = ['latitude', 'longitude']
+            
+            if all(col in route_df.columns for col in required_columns):
+                # Criar um mapa centrado na média das coordenadas
+                lat_medio = route_df['latitude'].mean()
+                lon_medio = route_df['longitude'].mean()
+                
+                m = folium.Map(location=[lat_medio, lon_medio], zoom_start=14)
+                
+                # Adicionar marcadores para cada ponto ou desenhar linha conectando os pontos
+                points = list(zip(route_df['latitude'], route_df['longitude']))
+                
+                # Adicionar uma linha conectando os pontos (traçar a rota)
+                folium.PolyLine(
+                    points,
+                    weight=5,
+                    color='blue',
+                    opacity=0.7
+                ).add_to(m)
+                
+                # Adicionar marcadores para o início e o fim da rota
+                folium.Marker(
+                    location=[route_df['latitude'].iloc[0], route_df['longitude'].iloc[0]],
+                    popup='Início',
+                    icon=folium.Icon(color='green')
+                ).add_to(m)
+                
+                folium.Marker(
+                    location=[route_df['latitude'].iloc[-1], route_df['longitude'].iloc[-1]],
+                    popup='Fim',
+                    icon=folium.Icon(color='red')
+                ).add_to(m)
+                
+                # Exibir o mapa
+                st.subheader("Mapa da Rota")
+                folium_static(m)
+                
+                # Mostrar estatísticas da rota, se disponíveis
+                if 'distance' in route_df.columns:
+                    total_distance = route_df['distance'].sum() / 1000  # Convertendo para km, se em metros
+                    st.metric("Distância Total", f"{total_distance:.2f} km")
+                
+                # Mostrar tabela com as primeiras linhas das coordenadas
+                st.subheader("Amostra dos dados de coordenadas")
+                st.dataframe(route_df.head(10))
+                
+            else:
+                st.error(f"O arquivo de rotas não contém as colunas necessárias: {required_columns}")
+                st.write("Colunas disponíveis:", list(route_df.columns))
+    
+    except FileNotFoundError:
+        st.error("Arquivo de rotas não encontrado. Verifique se o arquivo 'abc' existe.")
+    except Exception as e:
+        st.error(f"Erro ao carregar o arquivo de rotas: {str(e)}")
 
-    # Dados
-    data = {'Nome': ['Alice', 'Bob', 'Charlie'],
-            'Idade': [25, 30, 22],
-            'Cidade': ['Recife', 'Olinda', 'Jaboatão']}
-    df = pd.DataFrame(data)
+# ==============================================================================
+with tab_detalhamento:
 
-    # Converter DataFrame para HTML com classe CSS
-    html_table = df.to_html(classes='estilo_tabela', index=False)
+    # =======================================================
+    # aba Detalhamento das Atividades
+    # =======================================================
+    titulo = f'<h3>Detalhamento das Atividades</h3>'
+    st.markdown(titulo, unsafe_allow_html=True)
 
-    # Exibir o CSS e a tabela HTML no Streamlit
-    st.markdown(css, unsafe_allow_html=True)
-    st.markdown(html_table, unsafe_allow_html=True)
+    # CSS adicional para botão e layout do detalhamento
+    st.markdown("""
+    <style>
+    .btn-detalhar {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 2px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+    .detalhe-atividade {
+        background-color: #f5f5f5;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Definindo os anos disponíveis para seleção
+    anos_disponiveis = ['2020', '2021', '2022', '2023', '2024', '2025']
+    
+    # Organizando os filtros em 3 colunas
+    col1, col2, col3 = st.columns(3)
+    
+    # Coluna 1: Filtro de ano
+    with col1:
+        filtro_ano = st.selectbox('Selecione o ano:', anos_disponiveis, index=5)  # Default para 2025
+    
+    # Coluna 2: Checkbox para habilitar filtro por mês
+    with col2:
+        filtrar_por_mes = st.checkbox('Filtrar por mês')
+    
+    # Coluna 3: Filtro de mês (aparece somente se o checkbox estiver marcado)
+    with col3:
+        if filtrar_por_mes:
+            meses = {
+                '01 - Janeiro': 1, '02 - Fevereiro': 2, '03 - Março': 3, '04 - Abril': 4,
+                '05 - Maio': 5, '06 - Junho': 6, '07 - Julho': 7, '08 - Agosto': 8,
+                '09 - Setembro': 9, '10 - Outubro': 10, '11 - Novembro': 11, '12 - Dezembro': 12
+            }
+            filtro_mes = st.selectbox('Selecione o mês:', list(meses.keys()))
+            mes_selecionado = meses[filtro_mes]
+        else:
+            mes_selecionado = None
+            st.empty()  # Espaço vazio para manter alinhamento
+    
+    # Definir o DataFrame baseado no ano selecionado
+    df_completo = None
+    if filtro_ano == '2020':
+        df_completo = df_atividades_completo_2020.copy()
+    elif filtro_ano == '2021':
+        df_completo = df_atividades_completo_2021.copy()
+    elif filtro_ano == '2022':
+        df_completo = df_atividades_completo_2022.copy()
+    elif filtro_ano == '2023':
+        df_completo = df_atividades_completo_2023.copy()
+    elif filtro_ano == '2024':
+        df_completo = df_atividades_completo_2024.copy()
+    elif filtro_ano == '2025':
+        df_completo = df_atividades_completo_2025.copy()
+    
+    # Filtrar por mês se necessário
+    if filtrar_por_mes and mes_selecionado is not None and df_completo is not None:
+        # Verificar se 'Activity Date' está no formato correto
+        if 'Activity Date' in df_completo.columns:
+            try:
+                # Converter para datetime
+                df_completo['Activity Date'] = pd.to_datetime(df_completo['Activity Date'], format='%b %d, %Y, %I:%M:%S %p', errors='coerce')
+                # Extrair mês e filtrar
+                df_completo = df_completo[df_completo['Activity Date'].dt.month == mes_selecionado]
+            except Exception as e:
+                st.error(f"Erro ao filtrar por mês: {str(e)}")
+        else:
+            # Tentar usar a coluna data_mes se disponível
+            if 'data_mes' in df_completo.columns:
+                df_completo = df_completo[df_completo['data_mes'] == mes_selecionado]
+    
+    # Verificar se temos dados para exibir
+    if df_completo is not None and not df_completo.empty:
+        # Preparar dados para a tabela
+        df_tabela = df_completo.copy()
+        
+        # Verificar e converter 'Activity Date' para datetime
+        if 'Activity Date' in df_tabela.columns:
+            df_tabela['Activity Date'] = pd.to_datetime(df_tabela['Activity Date'], format='%b %d, %Y, %I:%M:%S %p', errors='coerce')
+            # Criar coluna formatada para exibição
+            df_tabela['Data Formatada'] = df_tabela['Activity Date'].dt.strftime('%d/%m/%Y')
+            
+            # Adicionar dia da semana
+            df_tabela['Dia da Semana'] = df_tabela['Activity Date'].apply(
+                lambda x: retorna_dia_da_semana(x.strftime('%b %d, %Y, %I:%M:%S %p')) if not pd.isna(x) else "")
+        else:
+            st.warning("Coluna 'Activity Date' não encontrada no conjunto de dados.")
+            # Criar colunas vazias para manter a estrutura
+            df_tabela['Data Formatada'] = ""
+            df_tabela['Dia da Semana'] = ""
+        
+        # Selecionar colunas essenciais para exibição
+        colunas_essenciais = ['Activity ID', 'Data Formatada', 'Dia da Semana', 'Activity Name', 'Activity Type']
+        
+        # Adicionar descrição se disponível
+        if 'Activity Description' in df_tabela.columns:
+            colunas_essenciais.append('Activity Description')
+        
+        # Verificar se todas as colunas essenciais existem
+        colunas_existentes = [col for col in colunas_essenciais if col in df_tabela.columns]
+        
+        # Criar dataframe para exibição
+        if len(colunas_existentes) > 0:
+            df_exibicao = df_tabela[colunas_existentes].copy()
+            
+            # Renomear colunas para português
+            renomear_colunas = {
+                'Activity ID': 'ID da Atividade',
+                'Data Formatada': 'Data da Atividade',
+                'Dia da Semana': 'Dia da Semana',
+                'Activity Name': 'Nome da Atividade',
+                'Activity Type': 'Tipo da Atividade',
+                'Activity Description': 'Descrição da Atividade',
+                'Filename': 'Arquivo GPX',
+                'Distance': 'Distância (km)',
+                'Elapsed Time': 'Tempo (min)',
+                'Average Speed': 'Velocidade Média (km/h)',
+                'Max Speed': 'Velocidade Máxima (km/h)',
+                'Calories': 'Calorias',
+                'Elevation Gain': 'Ganho de Elevação (m)',
+                'Max Heart Rate': 'FC Máxima (bpm)',
+                'Average Heart Rate': 'FC Média (bpm)'
+            }
+            
+            # Aplicar renomeação apenas para colunas que existem
+            renomear = {k: v for k, v in renomear_colunas.items() if k in df_exibicao.columns}
+            df_exibicao = df_exibicao.rename(columns=renomear)
+            
+            # Exibir a tabela usando o método dataframe do Streamlit
+            st.dataframe(df_exibicao, use_container_width=True)
+            
+            # Área para exibir detalhes de uma atividade específica
+            st.markdown('### Detalhes da Atividade')
+            
+            # Permitir ao usuário selecionar uma atividade para ver detalhes
+            id_atividades = df_tabela['Activity ID'].astype(str).tolist()
+            id_atividades_dict = {f"{row['Activity Name']} ({row['Activity ID']})": row['Activity ID'] 
+                              for _, row in df_tabela.iterrows() if 'Activity Name' in row and 'Activity ID' in row}
+            
+            if id_atividades_dict:
+                atividade_selecionada = st.selectbox('Selecione uma atividade para ver detalhes:', 
+                                                 list(id_atividades_dict.keys()))
+                
+                id_selecionado = id_atividades_dict[atividade_selecionada]
+                
+                # Filtrar dados da atividade selecionada
+                atividade_detalhes = df_tabela[df_tabela['Activity ID'] == id_selecionado].iloc[0]
+                
+                # Criar layout em duas colunas para os detalhes
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.subheader("Informações Básicas")
+                    st.write(f"**ID:** {atividade_detalhes.get('Activity ID', 'N/A')}")
+                    st.write(f"**Nome:** {atividade_detalhes.get('Activity Name', 'N/A')}")
+                    st.write(f"**Tipo:** {atividade_detalhes.get('Activity Type', 'N/A')}")
+                    st.write(f"**Data:** {atividade_detalhes.get('Data Formatada', 'N/A')}")
+                    st.write(f"**Dia da Semana:** {atividade_detalhes.get('Dia da Semana', 'N/A')}")
+                    st.write(f"**GPX File:** {atividade_detalhes.get('Filename', 'N/A')}")
+
+                    if 'Activity Description' in atividade_detalhes and not pd.isna(atividade_detalhes['Activity Description']):
+                        st.write(f"**Descrição:** {atividade_detalhes['Activity Description']}")
+                
+                with col2:
+                    st.subheader("Métricas da Atividade")
+                    
+                    # Verificar e exibir métricas disponíveis
+                    if 'Distance' in atividade_detalhes and not pd.isna(atividade_detalhes['Distance']):
+                        st.metric("Distância", f"{float(atividade_detalhes['Distance']):.2f} km")
+                    
+                    if 'Elapsed Time' in atividade_detalhes and not pd.isna(atividade_detalhes['Elapsed Time']):
+                        tempo_seg = float(atividade_detalhes['Elapsed Time'])
+                        tempo_min = tempo_seg / 60  # Convertendo segundos para minutos
+                        st.metric("Tempo", f"{tempo_min:.2f} min")
+                    
+                    if 'Average Speed' in atividade_detalhes and not pd.isna(atividade_detalhes['Average Speed']):
+                        st.metric("Velocidade Média", f"{float(atividade_detalhes['Average Speed']):.2f} km/h")
+                    
+                    if 'Max Speed' in atividade_detalhes and not pd.isna(atividade_detalhes['Max Speed']):
+                        st.metric("Velocidade Máxima", f"{float(atividade_detalhes['Max Speed']):.2f} km/h")
+                    
+                    if 'Calories' in atividade_detalhes and not pd.isna(atividade_detalhes['Calories']):
+                        st.metric("Calorias", f"{float(atividade_detalhes['Calories']):.0f}")
+                
+                # Verificar se existe arquivo GPX para a atividade
+                filename = atividade_detalhes.get('Filename', '')
+                gpx_id = None
+                
+                if isinstance(filename, str) and filename.startswith('activities/'):
+                    # Extrair ID do arquivo
+                    gpx_id = filename.replace('activities/', '').split('.')[0]
+                    print(f"gpx_id => {gpx_id}")
+                # Verificar se existe arquivo GPX correspondente
+                if gpx_id:
+                    gpx_filepath = f"activities-gpx/{gpx_id}.gpx"
+                    print(f"gpx_filepath => {gpx_filepath}")
+                    import os
+                    if os.path.exists(gpx_filepath):
+                        st.subheader("Mapa da Rota")
+                        exibe_mapa_coordenadas('4021635014.csv')
+
+
+        else:
+            st.error("Não foi possível exibir os dados. Nenhuma coluna essencial encontrada.")
+    else:
+        st.warning("Não há dados disponíveis para os filtros selecionados.")
+# ==============================================================================
+# ==============================================================================
+with tab_mapas_02:
+
+    # =======================================================
+    # aba Mapas
+    # =======================================================
+    titulo = f'<h3>NOVO Mapas de Rotas NOVO</h3>'
+    st.markdown(titulo, unsafe_allow_html=True)
+    
+    #4021635014.csv
+    exibe_mapa_coordenadas('4021635014.csv')
+
+# ==============================================================================
+

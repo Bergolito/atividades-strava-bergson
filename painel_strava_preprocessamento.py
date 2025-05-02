@@ -74,7 +74,9 @@ def salvar_arquivos_atividades_simplificados_anos():
   nome_arquivo = f'datasets/predados/atividades_fisicas_simplificado_todos.csv'
   print(f'Gerado arquivo de atvs fisicas => {nome_arquivo}...')
   lista_colunas_dropar_03 = [
-    'Relative Effort',	'Commute',	'Activity Private Note',	'Activity Gear',	'Filename',	'Athlete Weight',	'Bike Weight',	
+    'Relative Effort',	'Commute',	'Activity Private Note',	'Activity Gear',	
+    #'Filename',	É necessário para recuperar os arquivos das rotas
+    'Athlete Weight',	'Bike Weight',	
     'Elapsed Time.1',	
     'Moving Time',	'Distance.1',	'Elevation Gain',	'Elevation Loss',	'Elevation Low',	'Elevation High',	'Max Grade',	
     'Average Grade',	
@@ -169,6 +171,23 @@ def compactar_pasta(pasta_origem, nome_base):
     print(f"Pasta '{pasta_origem}' compactada com sucesso em '{caminho_arquivo_zip}'")
 # ==================================
 
+def convert_tcx_to_gpx(file_to_convert):
+    """
+    Converte um arquivo TCX para GPX.
+    """
+    # Importa a biblioteca tcx2gpx
+    from tcx2gpx.tcx2gpx import TCX2GPX
+
+    # Cria um objeto TCX2GPX e converte o arquivo
+    gps_object = TCX2GPX(tcx_path=file_to_convert)
+    gps_object.convert()
+
+    from tcx2gpx.tcx2gpx import TCX2GPX
+
+    gps_object = TCX2GPX(tcx_path=file_to_convert)
+    gps_object.convert()
+# ==================================
+
 # ==================================
 # ATENÇÂO
 # ==================================
@@ -190,5 +209,6 @@ def executa_preprocessamento_dados():
 # ==================================
 if __name__ == "__main__":
   # Executa o código
-  executa_preprocessamento_dados()
+  #executa_preprocessamento_dados()
+  convert_tcx_to_gpx('activities/14980360650.tcx')
 # ==================================  
