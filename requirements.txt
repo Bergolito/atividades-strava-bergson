@@ -2,7 +2,7 @@ pandas
 numpy
 geopandas
 streamlit
-streamlit_folium
+streamlit-folium
 altair
 altair_saver
 vega_datasets
