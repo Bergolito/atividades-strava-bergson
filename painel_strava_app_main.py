@@ -150,15 +150,15 @@ if 'ano_selecionado' not in st.session_state:
 # Definição de abas
 primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_mapas, tab_detalhamento, tab_mapas_02 = st.tabs(
   [
-    "Atividades em Geral",
-    "Atividades por Tipo",
-    "Atividades Físicas por ano e mês",
-    "Atividades por Ranking",
-    "Atividades por Barras Empilhadas",
-    "Atividades por Fluxo",
-    "Atividades por Mapa de Calor",
+    "Atvs em Geral",
+    "Atvs por Tipo",
+    "Atvs Físicas por ano e mês",
+    "Atvs por Ranking",
+    "Atvs por Barras Empilhadas",
+    "Atvs por Fluxo",
+    "Atvs por Mapa de Calor",
     "Mapas",
-    "Detalhamento das Atividades",
+    "Detalhamento",
     "Mapas NOVO 02",
   ]
 )
