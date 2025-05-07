@@ -151,15 +151,14 @@ if 'ano_selecionado' not in st.session_state:
 # Definição de abas
 primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_detalhamento, nova_aba = st.tabs(
   [
-    "Atvs em Geral",
-    "Atvs por Tipo",
-    "Atvs Físicas por ano e mês",
-    "Atvs por Ranking",
-    "Atvs por Barras Empilhadas",
-    "Atvs por Fluxo",
-    "Atvs por Mapa de Calor",
+    "Atvs - Geral",
+    "Atvs - Tipo",
+    "Atvs - Ranking",
+    "Atvs - Barras Empilhadas",
+    "Atvs - Fluxo",
+    "Atvs - Mapa de Calor",
     "Atvs - Detalhamento",
-    "Grid Mensal"
+    "Atvs - Grid Mensal"
   ]
 )
 
@@ -440,41 +439,6 @@ with segunda_aba:
     else:
         st.info("Selecione um ano específico posterior a 2020 para ver análise comparativa de progresso.")
 
-# ==============================================================================
-with terceira_aba:
-
-    # =======================================================
-    # terceira_aba
-    # =======================================================
-    titulo = f'<h3> Atividades Físicas'
-    st.markdown(titulo, unsafe_allow_html=True)  
-
-    def gera_grafico_barras_mes(mes):
-        nome_mes = obter_mes_por_numero(mes)
-        titulo = f'{nome_mes} de {ano_selecionado1}'
-        df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df_selecionado, ano_selecionado1, mes)
-
-        st.write(titulo) 
-        html_table1 = df_filtro.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
-        st.write(html_table1, unsafe_allow_html=True)
-
-        grafico_ano_mes = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
-        st.altair_chart(grafico_ano_mes, use_container_width=False)
-
-    if ano_selecionado1 != 'Todos':
-        col1, col2 = st.columns(2)
-        with col1:
-            # De Janeiro a Junho
-            for mes in range(1, 6):
-                gera_grafico_barras_mes(mes)
-
-        with col2:    
-
-            # De Julho a Dezembro
-            for mes in range(7, 12):
-                gera_grafico_barras_mes(mes)
-    else:
-        st.write("Esta funcionalidade não está disponível para a opção 'Todos'", unsafe_allow_html=True)
 # ==============================================================================
 with tab_03:
 
