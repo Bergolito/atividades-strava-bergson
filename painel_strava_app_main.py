@@ -149,7 +149,7 @@ if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_detalhamento, nova_aba = st.tabs(
+primeira_aba, segunda_aba, tab_03, tab_04, tab_05, tab_06, tab_detalhamento, nova_aba = st.tabs(
   [
     "Atvs - Geral",
     "Atvs - Tipo",
