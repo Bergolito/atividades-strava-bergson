@@ -4,8 +4,9 @@
 import pandas as pd
 import streamlit as st
 import folium
-from streamlit_folium import folium_static
+import streamlit as st
 
+from streamlit_folium import folium_static
 from painel_strava_funcoes import *
 from painel_strava_graficos import *
 
@@ -148,7 +149,7 @@ if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_mapas, tab_detalhamento, tab_mapas_02 = st.tabs(
+primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_detalhamento, nova_aba = st.tabs(
   [
     "Atvs em Geral",
     "Atvs por Tipo",
@@ -157,9 +158,8 @@ primeira_aba, segunda_aba, terceira_aba, tab_03, tab_04, tab_05, tab_06, tab_map
     "Atvs por Barras Empilhadas",
     "Atvs por Fluxo",
     "Atvs por Mapa de Calor",
-    "Mapas",
-    "Detalhamento",
-    "Mapas NOVO 02",
+    "Atvs - Detalhamento",
+    "Grid Mensal"
   ]
 )
 
@@ -197,79 +197,6 @@ else:
     elif st.session_state.ano_selecionado == '2025':
         ano_selecionado1 = 2025
         df_selecionado = df_atividades_simplificado_2025    
-
-# ==============================================================================
-# Funções
-# ==============================================================================
-
-    # =======================================================
-    # aba Mapas
-    def exibe_mapa_coordenadas(nome_arquivo):
-        import gpxpy
-        import gpxpy.gpx
-
-        try:
-            # Carregar o arquivo de rotas
-            route_df = pd.read_csv(f'datasets/mapas/{nome_arquivo}', sep=',')
-            
-            if route_df.empty:
-                st.warning("O arquivo de rotas está vazio. Não há dados para exibir no mapa.")
-            else:
-                # Verificar se o arquivo tem as colunas necessárias
-                required_columns = ['latitude', 'longitude']
-                
-                if all(col in route_df.columns for col in required_columns):
-                    # Criar um mapa centrado na média das coordenadas
-                    lat_medio = route_df['latitude'].mean()
-                    lon_medio = route_df['longitude'].mean()
-                    
-                    m = folium.Map(location=[lat_medio, lon_medio], zoom_start=14)
-                    
-                    # Adicionar marcadores para cada ponto ou desenhar linha conectando os pontos
-                    points = list(zip(route_df['latitude'], route_df['longitude']))
-                    
-                    # Adicionar uma linha conectando os pontos (traçar a rota)
-                    folium.PolyLine(
-                        points,
-                        weight=5,
-                        color='blue',
-                        opacity=0.7
-                    ).add_to(m)
-                    
-                    # Adicionar marcadores para o início e o fim da rota
-                    folium.Marker(
-                        location=[route_df['latitude'].iloc[0], route_df['longitude'].iloc[0]],
-                        popup='Início',
-                        icon=folium.Icon(color='green')
-                    ).add_to(m)
-                    
-                    folium.Marker(
-                        location=[route_df['latitude'].iloc[-1], route_df['longitude'].iloc[-1]],
-                        popup='Fim',
-                        icon=folium.Icon(color='red')
-                    ).add_to(m)
-                    
-                    # Exibir o mapa
-                    st.subheader("Mapa da Rota")
-                    folium_static(m)
-                    
-                    # Mostrar estatísticas da rota, se disponíveis
-                    if 'distance' in route_df.columns:
-                        total_distance = route_df['distance'].sum() / 1000  # Convertendo para km, se em metros
-                        st.metric("Distância Total", f"{total_distance:.2f} km")
-                    
-                    # Mostrar tabela com as primeiras linhas das coordenadas
-                    st.subheader("Amostra dos dados de coordenadas")
-                    st.dataframe(route_df.head(10))
-                    
-                else:
-                    st.error(f"O arquivo de rotas não contém as colunas necessárias: {required_columns}")
-                    st.write("Colunas disponíveis:", list(route_df.columns))
-        
-        except FileNotFoundError:
-            st.error("Arquivo de rotas não encontrado. Verifique se o arquivo 'abc' existe.")
-        except Exception as e:
-            st.error(f"Erro ao carregar o arquivo de rotas: {str(e)}")
 
 # ==============================================================================
 with primeira_aba:
@@ -375,26 +302,143 @@ with segunda_aba:
     df_filtro2.loc[index_linha1,'qtd']=total
     df_filtro2.loc[index_linha1,'ano']=''
 
-    html_table1 = df_filtro2.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
-    st.write(html_table1, unsafe_allow_html=True)
+    # Layout em duas colunas para melhor organização
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        html_table1 = df_filtro2.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
+        st.write(html_table1, unsafe_allow_html=True)
+        
+        # Gráfico de pizza para distribuição por tipo
+        st.subheader("Distribuição de Atividades por Tipo")
+        grafico_pizza = grafico_pizza_tipo_atv(df_filtro)
+        st.altair_chart(grafico_pizza, use_container_width=True)
 
-    index_linha2 = df_sumario_2024.shape[0]+1
-    df_sumario_2024.loc[index_linha2,'mes']='TOTAL'
-    total_qtd = df_sumario_2024['qtd'].sum()
-    total_distancia = df_sumario_2024['distancia'].sum()
-    total_caloria = df_sumario_2024['calorias'].sum()
-    df_sumario_2024.loc[index_linha2,'qtd']=total
-    df_sumario_2024.loc[index_linha2,'distancia']=total_distancia
-    df_sumario_2024.loc[index_linha2,'calorias']=total_caloria
+    with col2:
+        index_linha2 = df_sumario_2024.shape[0]+1
+        df_sumario_2024.loc[index_linha2,'mes']='TOTAL'
+        total_qtd = df_sumario_2024['qtd'].sum()
+        total_distancia = df_sumario_2024['distancia'].sum()
+        total_caloria = df_sumario_2024['calorias'].sum()
+        df_sumario_2024.loc[index_linha2,'qtd']=total
+        df_sumario_2024.loc[index_linha2,'distancia']=total_distancia
+        df_sumario_2024.loc[index_linha2,'calorias']=total_caloria
 
-    html_table2 = df_sumario_2024.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
-    st.write(html_table2, unsafe_allow_html=True)
+        html_table2 = df_sumario_2024.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
+        st.write(html_table2, unsafe_allow_html=True)
+        
+        # Gráfico de barras para tipos de exercício
+        st.subheader("Quantidade por Tipo de Exercício")
+        grafico_ano = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
+        st.altair_chart(grafico_ano, use_container_width=True)
 
-    grafico_pizza = grafico_pizza_tipo_atv(df_filtro)
-    st.altair_chart(grafico_pizza, use_container_width=False)
-
-    grafico_ano = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
-    st.altair_chart(grafico_ano, use_container_width=False)
+    # Seção de métricas importantes - números destacados
+    st.subheader("Métricas de Desempenho")
+    
+    # Criando uma linha com métricas principais
+    metrica1, metrica2, metrica3, metrica4 = st.columns(4)
+    
+    # Calculando métricas relevantes
+    if df_filtro is not None and not df_filtro.empty:
+        # Extrair e formatar métricas
+        total_atividades = total
+        media_por_mes = round(total / 12, 1) if ano_selecionado1 != 'Todos' else round(total / (len(df_filtro['ano'].unique()) * 12), 1)
+        
+        # Apresentando métricas em cards
+        with metrica1:
+            st.metric(label="Total de Atividades", value=f"{total_atividades}")
+        
+        with metrica2:
+            st.metric(label="Média Mensal", value=f"{media_por_mes}")
+        
+        with metrica3:
+            if 'distancia' in df_sumario_2024.columns:
+                total_distancia = round(total_distancia, 2)
+                st.metric(label="Distância Total (km)", value=f"{total_distancia}")
+        
+        with metrica4:
+            if 'calorias' in df_sumario_2024.columns:
+                total_calorias = round(total_caloria, 0)
+                st.metric(label="Calorias Totais", value=f"{total_calorias}")
+    
+    # Seção de análise de tendências
+    st.subheader("Análise de Tendências")
+    
+    # Criando abas para diferentes visualizações de tendências
+    tab_tendencia1, tab_tendencia2 = st.tabs(["Tendência por Período", "Comparação de Tipos"])
+    
+    with tab_tendencia1:
+        # Aqui podemos ver a evolução das atividades por período (dias da semana, meses)
+        if ano_selecionado1 != 'Todos':
+            st.write("Distribuição de Atividades por Dia da Semana")
+            df_dia_semana = df_atvs_dia_semana_todos[df_atvs_dia_semana_todos['ano'] == ano_selecionado1]
+            grafico_dias_semana = gera_grafico_por_dia_semana(f"Atividades por Dia da Semana em {ano_selecionado1}", df_dia_semana)
+            st.altair_chart(grafico_dias_semana, use_container_width=True)
+        else:
+            st.write("Evolução de Atividades ao Longo dos Anos")
+            grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, "Evolução dos Tipos de Atividades ao Longo dos Anos")    
+            st.altair_chart(grafico_ranking_01, use_container_width=True)
+    
+    with tab_tendencia2:
+        # Comparação entre diferentes tipos de atividades
+        if ano_selecionado1 != 'Todos':
+            st.write(f"Mapa de Calor por Tipo de Atividade em {ano_selecionado1}")
+            df_heatmap = df_atvs_tipo_todos[df_atvs_tipo_todos['ano'] == ano_selecionado1]
+            grafico_heatmap = gera_graficos_mapa_calor_por_tipo_atv(df_heatmap, f"Intensidade de Atividades por Tipo em {ano_selecionado1}")
+            st.altair_chart(grafico_heatmap, use_container_width=True)
+        else:
+            st.write("Comparação dos Tipos de Atividades ao Longo dos Anos")
+            grafico_fluxo = gera_graficos_fluxo_por_tipo("Fluxo de Atividades por Tipo ao Longo dos Anos", df_atvs_tipo_todos)
+            st.altair_chart(grafico_fluxo, use_container_width=True)
+            
+    # Análise de progresso
+    st.subheader("Análise de Progresso")
+    
+    # Seção para mostrar o progresso comparando períodos
+    if ano_selecionado1 != 'Todos' and int(ano_selecionado1) > 2020:
+        ano_anterior = int(ano_selecionado1) - 1
+        
+        df_ano_atual = df_atvs_tipo_todos[df_atvs_tipo_todos['ano'] == ano_selecionado1]
+        df_ano_anterior = df_atvs_tipo_todos[df_atvs_tipo_todos['ano'] == ano_anterior]
+        
+        if not df_ano_anterior.empty and not df_ano_atual.empty:
+            total_atual = df_ano_atual['qtd'].sum()
+            total_anterior = df_ano_anterior['qtd'].sum()
+            
+            variacao = ((total_atual - total_anterior) / total_anterior) * 100 if total_anterior > 0 else 100
+            
+            st.write(f"### Comparação com {ano_anterior}")
+            col_prog1, col_prog2 = st.columns(2)
+            
+            with col_prog1:
+                st.metric(
+                    label=f"Variação de Atividades em relação a {ano_anterior}", 
+                    value=f"{total_atual}",
+                    delta=f"{variacao:.1f}%"
+                )
+            
+            with col_prog2:
+                # Agrupamento para comparativo
+                df_comparativo = pd.DataFrame({
+                    'Ano': [str(ano_anterior), str(ano_selecionado1)],
+                    'Total': [total_anterior, total_atual]
+                })
+                
+                # Gráfico de barras comparativo
+                grafico_comparativo = alt.Chart(df_comparativo).mark_bar().encode(
+                    x=alt.X('Ano:N', title='Ano'),
+                    y=alt.Y('Total:Q', title='Total de Atividades'),
+                    color=alt.Color('Ano:N', legend=None),
+                    tooltip=['Ano', 'Total']
+                ).properties(
+                    title="Comparativo de Atividades entre Anos",
+                    width=300,
+                    height=300
+                ).interactive()
+                
+                st.altair_chart(grafico_comparativo, use_container_width=True)
+    else:
+        st.info("Selecione um ano específico posterior a 2020 para ver análise comparativa de progresso.")
 
 # ==============================================================================
 with terceira_aba:
@@ -500,78 +544,6 @@ with tab_06:
     st.altair_chart(grafico_mapa_calor_02, use_container_width=False)
 
 # ==============================================================================
-with tab_mapas:
-    # =======================================================
-    # aba Mapas
-    # =======================================================
-    titulo = f'<h3>Mapas de Rotas</h3>'
-    st.markdown(titulo, unsafe_allow_html=True)
-    
-    try:
-        # Carregar o arquivo de rotas
-        #8178949214.csv
-        route_df = pd.read_csv('datasets/mapas/8178949214.csv', sep=',')
-        
-        if route_df.empty:
-            st.warning("O arquivo de rotas está vazio. Não há dados para exibir no mapa.")
-        else:
-            # Verificar se o arquivo tem as colunas necessárias
-            required_columns = ['latitude', 'longitude']
-            
-            if all(col in route_df.columns for col in required_columns):
-                # Criar um mapa centrado na média das coordenadas
-                lat_medio = route_df['latitude'].mean()
-                lon_medio = route_df['longitude'].mean()
-                
-                m = folium.Map(location=[lat_medio, lon_medio], zoom_start=14)
-                
-                # Adicionar marcadores para cada ponto ou desenhar linha conectando os pontos
-                points = list(zip(route_df['latitude'], route_df['longitude']))
-                
-                # Adicionar uma linha conectando os pontos (traçar a rota)
-                folium.PolyLine(
-                    points,
-                    weight=5,
-                    color='blue',
-                    opacity=0.7
-                ).add_to(m)
-                
-                # Adicionar marcadores para o início e o fim da rota
-                folium.Marker(
-                    location=[route_df['latitude'].iloc[0], route_df['longitude'].iloc[0]],
-                    popup='Início',
-                    icon=folium.Icon(color='green')
-                ).add_to(m)
-                
-                folium.Marker(
-                    location=[route_df['latitude'].iloc[-1], route_df['longitude'].iloc[-1]],
-                    popup='Fim',
-                    icon=folium.Icon(color='red')
-                ).add_to(m)
-                
-                # Exibir o mapa
-                st.subheader("Mapa da Rota")
-                folium_static(m)
-                
-                # Mostrar estatísticas da rota, se disponíveis
-                if 'distance' in route_df.columns:
-                    total_distance = route_df['distance'].sum() / 1000  # Convertendo para km, se em metros
-                    st.metric("Distância Total", f"{total_distance:.2f} km")
-                
-                # Mostrar tabela com as primeiras linhas das coordenadas
-                st.subheader("Amostra dos dados de coordenadas")
-                st.dataframe(route_df.head(10))
-                
-            else:
-                st.error(f"O arquivo de rotas não contém as colunas necessárias: {required_columns}")
-                st.write("Colunas disponíveis:", list(route_df.columns))
-    
-    except FileNotFoundError:
-        st.error("Arquivo de rotas não encontrado. Verifique se o arquivo 'abc' existe.")
-    except Exception as e:
-        st.error(f"Erro ao carregar o arquivo de rotas: {str(e)}")
-
-# ==============================================================================
 with tab_detalhamento:
 
     # =======================================================
@@ -623,9 +595,18 @@ with tab_detalhamento:
     with col3:
         if filtrar_por_mes:
             meses = {
-                '01 - Janeiro': 1, '02 - Fevereiro': 2, '03 - Março': 3, '04 - Abril': 4,
-                '05 - Maio': 5, '06 - Junho': 6, '07 - Julho': 7, '08 - Agosto': 8,
-                '09 - Setembro': 9, '10 - Outubro': 10, '11 - Novembro': 11, '12 - Dezembro': 12
+                '01 - Janeiro': 1, 
+                '02 - Fevereiro': 2, 
+                '03 - Março': 3, 
+                '04 - Abril': 4,
+                '05 - Maio': 5, 
+                '06 - Junho': 6, 
+                '07 - Julho': 7, 
+                '08 - Agosto': 8,
+                '09 - Setembro': 9, 
+                '10 - Outubro': 10, 
+                '11 - Novembro': 11, 
+                '12 - Dezembro': 12
             }
             filtro_mes = st.selectbox('Selecione o mês:', list(meses.keys()))
             mes_selecionado = meses[filtro_mes]
@@ -685,11 +666,7 @@ with tab_detalhamento:
             df_tabela['Dia da Semana'] = ""
         
         # Selecionar colunas essenciais para exibição
-        colunas_essenciais = ['Activity ID', 'Data Formatada', 'Dia da Semana', 'Activity Name', 'Activity Type']
-        
-        # Adicionar descrição se disponível
-        if 'Activity Description' in df_tabela.columns:
-            colunas_essenciais.append('Activity Description')
+        colunas_essenciais = ['Data Formatada', 'Dia da Semana', 'Activity Name', 'Activity Type','Filename']
         
         # Verificar se todas as colunas essenciais existem
         colunas_existentes = [col for col in colunas_essenciais if col in df_tabela.columns]
@@ -700,12 +677,10 @@ with tab_detalhamento:
             
             # Renomear colunas para português
             renomear_colunas = {
-                'Activity ID': 'ID da Atividade',
-                'Data Formatada': 'Data da Atividade',
+                'Data Formatada': 'Data',
                 'Dia da Semana': 'Dia da Semana',
                 'Activity Name': 'Nome da Atividade',
                 'Activity Type': 'Tipo da Atividade',
-                'Activity Description': 'Descrição da Atividade',
                 'Filename': 'Arquivo GPX',
                 'Distance': 'Distância (km)',
                 'Elapsed Time': 'Tempo (min)',
@@ -729,7 +704,7 @@ with tab_detalhamento:
             
             # Permitir ao usuário selecionar uma atividade para ver detalhes
             id_atividades = df_tabela['Activity ID'].astype(str).tolist()
-            id_atividades_dict = {f"{row['Activity Name']} ({row['Activity ID']})": row['Activity ID'] 
+            id_atividades_dict = {f"{row['Data Formatada']} - {row['Activity Type']} - {row['Activity ID']}": row['Activity ID'] 
                               for _, row in df_tabela.iterrows() if 'Activity Name' in row and 'Activity ID' in row}
             
             if id_atividades_dict:
@@ -779,38 +754,244 @@ with tab_detalhamento:
                 
                 # Verificar se existe arquivo GPX para a atividade
                 filename = atividade_detalhes.get('Filename', '')
-                gpx_id = None
+                tcx_id = None
                 
                 if isinstance(filename, str) and filename.startswith('activities/'):
                     # Extrair ID do arquivo
-                    gpx_id = filename.replace('activities/', '').split('.')[0]
-                    print(f"gpx_id => {gpx_id}")
-                # Verificar se existe arquivo GPX correspondente
-                if gpx_id:
-                    gpx_filepath = f"activities-gpx/{gpx_id}.gpx"
-                    print(f"gpx_filepath => {gpx_filepath}")
+                    tcx_id = filename.replace('activities/', '').split('.')[0]
+                    print(f"tcx_id => {tcx_id}")
+                
+                # Verificar se existe arquivo TCX na pasta 'arquivos-ok'
+                if tcx_id:
                     import os
-                    if os.path.exists(gpx_filepath):
-                        st.subheader("Mapa da Rota")
-                        exibe_mapa_coordenadas('4021635014.csv')
-
-
+                    tcx_filepath_ok = f"activities-tcx/arquivos-ok/{tcx_id}.tcx"
+                    csv_filepath = f"activities-tcx/arquivos-csv/{tcx_id}.csv"
+                    
+                    if os.path.exists(tcx_filepath_ok):
+                        st.success(f"Arquivo TCX encontrado: {tcx_id}.tcx")
+                        
+                        # Verificar se existe o CSV correspondente
+                        if os.path.exists(csv_filepath):
+                            try:
+                                # Carregar o dataframe do CSV
+                                df_rota = pd.read_csv(csv_filepath)
+                                st.success(f"Dados da rota carregados com sucesso! ({df_rota.shape[0]} pontos)")
+                                
+                                # Verificar se o DataFrame tem colunas de latitude e longitude
+                                if 'latitude' in df_rota.columns and 'longitude' in df_rota.columns:
+                                    # Criar um mapa com os pontos da rota
+                                    st.subheader("Mapa da Rota")
+                                    
+                                    # Calcular o centro do mapa
+                                    lat_medio = df_rota['latitude'].mean()
+                                    lon_medio = df_rota['longitude'].mean()
+                                    
+                                    # Criar o mapa
+                                    m = folium.Map(location=[lat_medio, lon_medio], zoom_start=14)
+                                    
+                                    # Adicionar os pontos como uma linha
+                                    points = list(zip(df_rota['latitude'], df_rota['longitude']))
+                                    
+                                    # Adicionar uma linha conectando os pontos (traçar a rota)
+                                    folium.PolyLine(
+                                        points,
+                                        weight=5,
+                                        color='blue',
+                                        opacity=0.7
+                                    ).add_to(m)
+                                    
+                                    # Adicionar marcadores para o início e o fim da rota
+                                    folium.Marker(
+                                        location=[df_rota['latitude'].iloc[0], df_rota['longitude'].iloc[0]],
+                                        popup='Início',
+                                        icon=folium.Icon(color='green')
+                                    ).add_to(m)
+                                    
+                                    folium.Marker(
+                                        location=[df_rota['latitude'].iloc[-1], df_rota['longitude'].iloc[-1]],
+                                        popup='Fim',
+                                        icon=folium.Icon(color='red')
+                                    ).add_to(m)
+                                    
+                                    # Exibir o mapa
+                                    folium_static(m, width=900)
+                                    
+                                else:
+                                    st.warning("O arquivo CSV não contém coordenadas de latitude e longitude.")
+                            
+                            except Exception as e:
+                                st.error(f"Erro ao carregar o arquivo CSV: {str(e)}")
+                        else:
+                            st.warning(f"Arquivo CSV correspondente não encontrado: {csv_filepath}")
+                    else:
+                        st.info(f"Arquivo TCX não encontrado na pasta 'arquivos-ok': {tcx_filepath_ok}")
         else:
             st.error("Não foi possível exibir os dados. Nenhuma coluna essencial encontrada.")
     else:
         st.warning("Não há dados disponíveis para os filtros selecionados.")
 # ==============================================================================
-# ==============================================================================
-with tab_mapas_02:
+with nova_aba:
 
     # =======================================================
-    # aba Mapas
+    # Grid Mensal - exibindo 12 gráficos em grid 3x4
     # =======================================================
-    titulo = f'<h3>NOVO Mapas de Rotas NOVO</h3>'
-    st.markdown(titulo, unsafe_allow_html=True)
-    
-    #4021635014.csv
-    exibe_mapa_coordenadas('4021635014.csv')
+    titulo = f'<h3>Atividades Físicas - Grid Mensal</h3>'
+    st.markdown(titulo, unsafe_allow_html=True)  
 
+    if ano_selecionado1 != 'Todos':
+        st.write(f"### Atividades de {ano_selecionado1} organizadas por mês")
+        
+        # Função para criar um gráfico mensal com tamanho reduzido
+        def gera_grafico_compacto_mes(mes, df, ano):
+            nome_mes = obter_mes_por_numero(mes)
+            titulo = f'{nome_mes} de {ano}'
+            df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df, ano, mes)
+
+            # Criar gráfico mais compacto para caber no grid
+            grafico_mes = alt.Chart(df_filtro).mark_bar().encode(
+                x=alt.X('tipo_atividade:N', title='Tipo', axis=alt.Axis(labelAngle=-45, labelFontSize=10)),
+                y=alt.Y('qtd:Q', title='Qtd'),
+                tooltip=['tipo_atividade', 'qtd'],      
+                color=alt.Color('tipo_atividade:N', title='Tipo de Atividade')     
+            ).properties(
+                title=alt.Title(
+                    text=titulo,
+                    fontSize=14
+                ),
+                width=300,
+                height=200
+            ).interactive()
+            
+            return grafico_mes, df_filtro
+        
+        # Criar layout de grid 3x4 (3 colunas, 4 linhas)
+        # Linha 1 (Jan, Fev, Mar)
+        row1_col1, row1_col2, row1_col3 = st.columns(3)
+        
+        # Linha 2 (Abr, Mai, Jun)
+        row2_col1, row2_col2, row2_col3 = st.columns(3)
+        
+        # Linha 3 (Jul, Ago, Set)
+        row3_col1, row3_col2, row3_col3 = st.columns(3)
+        
+        # Linha 4 (Out, Nov, Dez)
+        row4_col1, row4_col2, row4_col3 = st.columns(3)
+        
+        # Linha 1: Janeiro, Fevereiro, Março
+        with row1_col1:
+            grafico_jan, df_jan = gera_grafico_compacto_mes(1, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_jan, use_container_width=True)
+            with st.expander("Dados Janeiro"):
+                st.dataframe(df_jan, use_container_width=True)
+        
+        with row1_col2:
+            grafico_fev, df_fev = gera_grafico_compacto_mes(2, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_fev, use_container_width=True)
+            with st.expander("Dados Fevereiro"):
+                st.dataframe(df_fev, use_container_width=True)
+        
+        with row1_col3:
+            grafico_mar, df_mar = gera_grafico_compacto_mes(3, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_mar, use_container_width=True)
+            with st.expander("Dados Março"):
+                st.dataframe(df_mar, use_container_width=True)
+        
+        # Linha 2: Abril, Maio, Junho
+        with row2_col1:
+            grafico_abr, df_abr = gera_grafico_compacto_mes(4, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_abr, use_container_width=True)
+            with st.expander("Dados Abril"):
+                st.dataframe(df_abr, use_container_width=True)
+        
+        with row2_col2:
+            grafico_mai, df_mai = gera_grafico_compacto_mes(5, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_mai, use_container_width=True)
+            with st.expander("Dados Maio"):
+                st.dataframe(df_mai, use_container_width=True)
+        
+        with row2_col3:
+            grafico_jun, df_jun = gera_grafico_compacto_mes(6, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_jun, use_container_width=True)
+            with st.expander("Dados Junho"):
+                st.dataframe(df_jun, use_container_width=True)
+        
+        # Linha 3: Julho, Agosto, Setembro
+        with row3_col1:
+            grafico_jul, df_jul = gera_grafico_compacto_mes(7, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_jul, use_container_width=True)
+            with st.expander("Dados Julho"):
+                st.dataframe(df_jul, use_container_width=True)
+        
+        with row3_col2:
+            grafico_ago, df_ago = gera_grafico_compacto_mes(8, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_ago, use_container_width=True)
+            with st.expander("Dados Agosto"):
+                st.dataframe(df_ago, use_container_width=True)
+        
+        with row3_col3:
+            grafico_set, df_set = gera_grafico_compacto_mes(9, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_set, use_container_width=True)
+            with st.expander("Dados Setembro"):
+                st.dataframe(df_set, use_container_width=True)
+        
+        # Linha 4: Outubro, Novembro, Dezembro
+        with row4_col1:
+            grafico_out, df_out = gera_grafico_compacto_mes(10, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_out, use_container_width=True)
+            with st.expander("Dados Outubro"):
+                st.dataframe(df_out, use_container_width=True)
+        
+        with row4_col2:
+            grafico_nov, df_nov = gera_grafico_compacto_mes(11, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_nov, use_container_width=True)
+            with st.expander("Dados Novembro"):
+                st.dataframe(df_nov, use_container_width=True)
+        
+        with row4_col3:
+            grafico_dez, df_dez = gera_grafico_compacto_mes(12, df_selecionado, ano_selecionado1)
+            st.altair_chart(grafico_dez, use_container_width=True)
+            with st.expander("Dados Dezembro"):
+                st.dataframe(df_dez, use_container_width=True)
+        
+        # Adicionar um resumo anual abaixo do grid
+        st.write("### Resumo Anual")
+        
+        # Obter dados de todos os meses e combinar
+        df_anual = pd.concat([df_jan, df_fev, df_mar, df_abr, df_mai, df_jun, 
+                               df_jul, df_ago, df_set, df_out, df_nov, df_dez])
+        
+        # Agrupar por tipo de atividade para obter o total anual
+        df_total_por_tipo = df_anual.groupby('tipo_atividade')['qtd'].sum().reset_index()
+        df_total_por_tipo['mes'] = 'Total Anual'
+        df_total_por_tipo['ano'] = ano_selecionado1
+        
+        # Gráfico de resumo anual (maior e mais detalhado)
+        grafico_anual = alt.Chart(df_total_por_tipo).mark_bar().encode(
+            x=alt.X('tipo_atividade:N', title='Tipo de Atividade'),
+            y=alt.Y('qtd:Q', title='Quantidade Total de Atividades'),
+            tooltip=['tipo_atividade', 'qtd'],      
+            color=alt.Color('tipo_atividade:N', title='Tipo de Atividade')     
+        ).properties(
+            title=alt.Title(
+                text=f'Resumo Anual de Atividades - {ano_selecionado1}'
+            ),
+            width=800,
+            height=400
+        ).interactive()
+        
+        # Exibir gráfico anual e dados
+        st.altair_chart(grafico_anual, use_container_width=True)
+        
+        # Adicionar tabela com dados anuais
+        with st.expander("Dados do Resumo Anual"):
+            # Adicionar uma linha com o total geral
+            total_geral = df_total_por_tipo['qtd'].sum()
+            df_total_com_soma = df_total_por_tipo.copy()
+            df_total_com_soma.loc[len(df_total_com_soma)] = ['TOTAL', total_geral, 'Total Anual', ano_selecionado1]
+            
+            st.dataframe(df_total_com_soma, use_container_width=True)
+        
+    else:
+        st.warning("Selecione um ano específico para visualizar o grid mensal de atividades.")
+        st.info("Esta funcionalidade não está disponível para a opção 'Todos'.")
 # ==============================================================================
-
