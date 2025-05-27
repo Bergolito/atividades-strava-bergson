@@ -197,7 +197,7 @@ def convert_tcx_to_gpx(file_to_convert):
 # 1. Compactar a pasta datasets
 # 2. Salvar os arquivos de atividades completos por ano
 # ==================================
-#compactar_pasta("datasets", "bkp_datasets")
+compactar_pasta("datasets", "bkp_datasets")
 
 # ==================================
 def executa_preprocessamento_dados():
@@ -209,6 +209,6 @@ def executa_preprocessamento_dados():
 # ==================================
 if __name__ == "__main__":
   # Executa o código
-  #executa_preprocessamento_dados()
-  convert_tcx_to_gpx('activities/14980360650.tcx')
+  #compactar_pasta("datasets", "bkp_datasets")
+  executa_preprocessamento_dados()
 # ==================================  
