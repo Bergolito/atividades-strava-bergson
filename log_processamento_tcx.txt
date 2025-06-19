@@ -1,0 +1,4 @@
+2025-06-19 11:21:07,929 - INFO - Iniciando processamento de arquivos TCX
+2025-06-19 11:21:07,929 - INFO - Verificação de diretórios concluída. Diretório de saída: OUTPUT
+2025-06-19 11:21:07,929 - WARNING - Nenhum arquivo TCX encontrado no diretório: INPUT
+2025-06-19 11:21:07,929 - INFO - Processamento concluído. Tempo total: 0:00:00.000450

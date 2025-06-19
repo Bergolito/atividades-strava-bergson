@@ -160,7 +160,7 @@ def recupera_coordenadas_arquivos_tcx():
     
     return count_success
 
-def processar_arquivo_tcx_para_csv(input_dir='INPUT', output_dir='OUTPUT'):
+def processar_arquivo_tcx_para_csv(input_dir, output_dir):
     """
     Função para processar arquivos TCX da pasta INPUT, extrair as principais informações
     e salvar os dados em arquivos CSV na pasta OUTPUT.
@@ -381,5 +381,5 @@ def processar_arquivo_tcx_para_csv(input_dir='INPUT', output_dir='OUTPUT'):
 if __name__ == "__main__":
   # Executa o código
   #recupera_coordenadas_arquivos_tcx()
-  processar_arquivo_tcx_para_csv()  
+  processar_arquivo_tcx_para_csv('activities-tcx/arquivos-ok', 'activities-tcx/arquivos-csv')  
 # ==================================

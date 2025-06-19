@@ -209,6 +209,6 @@ def executa_preprocessamento_dados():
 # ==================================
 if __name__ == "__main__":
   # Executa o código
-  #compactar_pasta("datasets", "bkp_datasets")
+  compactar_pasta("datasets", "bkp_datasets")
   executa_preprocessamento_dados()
 # ==================================  
