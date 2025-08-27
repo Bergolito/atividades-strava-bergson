@@ -5,7 +5,6 @@ import altair as alt
 import random
 import streamlit as st
 
-from vega_datasets import data
 from painel_strava_agrupamentos import *
 
 # =======================================================

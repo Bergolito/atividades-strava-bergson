@@ -21,10 +21,11 @@ pip install --upgrade pip
 
 # Instala as dependências necessárias
 echo "Instalando dependências..."
-pip install pandas matplotlib seaborn jupyter numpy autopep8 pylint
+#pip install pandas matplotlib seaborn jupyter numpy autopep8 pylint
+pip install pandas numpy autopep8 pylint folium streamlit_folium
 
 # Cria arquivo de requisitos
-pip freeze > requirements.txt
+#pip freeze > requirements.txt
 
 echo "Ambiente virtual configurado com sucesso!"
 echo "Para ativar o ambiente, execute: source venv/bin/activate"

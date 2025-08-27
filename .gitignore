@@ -6,5 +6,5 @@ __pycache__
 .streamlit
 .vscode
 venv
-INPUT
-OUTPUT
+
+*.pyc
