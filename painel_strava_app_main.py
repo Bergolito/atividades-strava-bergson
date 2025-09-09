@@ -4,11 +4,24 @@
 import pandas as pd
 import streamlit as st
 import folium
-import streamlit as st
+import plotly.graph_objects as go
 
 from streamlit_folium import folium_static
 from painel_strava_funcoes import *
 from painel_strava_graficos import *
+
+st.set_page_config(
+    page_title="Atividades Físicas Strava",
+    page_icon="🏃",
+
+    layout="wide",  # or "centered"
+    initial_sidebar_state="expanded",  # or "collapsed"
+    menu_items={
+        'Get Help': 'https://www.streamlit.io/help',
+        'Report a bug': 'https://github.com/streamlit/streamlit/issues',
+        'About': '# This is a header',
+    }
+)
 
 # =======================================================
 # Datasets
@@ -40,6 +53,14 @@ df_sumario_atvs_2022 = pd.read_csv('datasets/gerais/sumario_atividades_2022.csv'
 df_sumario_atvs_2023 = pd.read_csv('datasets/gerais/sumario_atividades_2023.csv', sep=',', encoding="UTF-8")
 df_sumario_atvs_2024 = pd.read_csv('datasets/gerais/sumario_atividades_2024.csv', sep=',', encoding="UTF-8")
 df_sumario_atvs_2025 = pd.read_csv('datasets/gerais/sumario_atividades_2025.csv', sep=',', encoding="UTF-8")
+df_sumario_atvs_todos = pd.concat(
+    [
+        df_sumario_atvs_2020, df_sumario_atvs_2021, df_sumario_atvs_2022, df_sumario_atvs_2023, df_sumario_atvs_2024, df_sumario_atvs_2025
+    ], ignore_index=True) 
+
+# adicionado
+df_tipo_todos = pd.read_csv('datasets/gerais/atividades_geral_por_tipo_ano_mes.csv', sep=',', encoding="UTF-8")
+df_dia_semana_todos = pd.read_csv('datasets/gerais/atividades_geral_por_dia_semana_ano_mes.csv', sep=',', encoding="UTF-8")
 
 # =======================================================
 # Constantes do dashboard
@@ -47,119 +68,63 @@ df_sumario_atvs_2025 = pd.read_csv('datasets/gerais/sumario_atividades_2025.csv'
 
 # CSS para estilizar a tabela
 css = """
-<style>
-.estilo_tabela {
-width: 100%;
-border-collapse: collapse;
-}
-.estilo_tabela th, .estilo_tabela td {
-border: 1px solid #ddd;
-padding: 8px;
-text-align: left;
-}
-.estilo_tabela th {
-background-color: #f2f2f2;
-font-weight: bold;
-}
-.estilo_tabela tr:nth-child(even) {
-background-color: #f9f9f9;
-}
-</style>
+    <style>
+    [data-testid="stSidebar"] {
+        background-color: #1c9ea0 !important;
+    }
+    [data-testid="stAppViewContainer"] {
+        background-color: #1c9ea0 !important;
+    }
+    [data-testid="stVerticalBlock"] {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 8px;
+    }   
+    </style>
 """
+
+st.markdown(css, unsafe_allow_html=True)
 
 OPCAO_TODOS = 'Todos'
 OPCAO_NONE = None
 COLUNA_ANO = 'ano'
-
-OPCAO_FILTRO_POR_UM_ANO = "Filtro por Um Ano"
-OPCAO_FILTRO_POR_PERIODO = "Filtro por Período"
-opcoes = [OPCAO_FILTRO_POR_UM_ANO, OPCAO_FILTRO_POR_PERIODO]
-
-ano_inicio = None
-ano_fim = None
-
-st.set_page_config(
-    page_title="Atividades Físicas Strava",
-    #page_icon="🧊",
-    page_icon="🏃",
-    #page_icon="sports_medal"	
-
-    layout="wide",  # or "centered"
-    initial_sidebar_state="expanded",  # or "collapsed"
-    menu_items={
-        'Get Help': 'https://www.streamlit.io/help',
-        'Report a bug': 'https://github.com/streamlit/streamlit/issues',
-        'About': '# This is a header',
-    }
-)
+PULA_LINHAS = '<br><br><br><br><br><br><br>'
 
 # Definir o título fixo para o painel
-st.title("Atividades Físicas Bergson (Strava)")
+st.title("Painel de Atividades Físicas Bergson")
 
 exibir_filtro_periodo_anos = False
+
+lista_anos = sorted(df_atividades_simplificado_todos['data_ano'].unique(), reverse=True)    
+ano_inicio = lista_anos[-1]
+ano_fim = lista_anos[0]
+
+opcoes_anos = [OPCAO_TODOS] + [str(ano) for ano in lista_anos]
 
 with st.sidebar:
     st.header("Filtros:")
     
-    opcao_selecionada = st.radio(
-        "Selecione uma opção:",
-        opcoes,
-        index=0,
-        disabled=False # Inicialmente habilitado
+    ano_selecionado = st.sidebar.selectbox(
+        'Qual o ano deseja visualizar?',
+        opcoes_anos, index=1,
+        key="ano_selecionado"
     )
-    indice_selecionado = opcoes.index(opcao_selecionada)
-    print(f'indice_selecionado => {indice_selecionado}')
 
-    st.session_state.opcao_selecionada = opcao_selecionada
+    #print(f'Ano Selecionado = {ano_selecionado}')
+    #st.write(f'Ano Selecionado = {ano_selecionado}', unsafe_allow_html=True)
 
-    if st.session_state.opcao_selecionada == OPCAO_FILTRO_POR_UM_ANO:
+    st.write(PULA_LINHAS, unsafe_allow_html=True)
+    st.image("images/logotipo.png", width=240)
+    st.write(PULA_LINHAS, unsafe_allow_html=True)
 
-        ano_selecionado = st.sidebar.selectbox(
-            'Qual o ano deseja visualizar?',
-            (OPCAO_TODOS,'2025','2024', '2023', '2022', '2021', '2020'), index=1,
-            key="ano_selecionado"
-        )
-
-        print(f'Ano Selecionado = {ano_selecionado}')
-
-        exibir_filtro_periodo_anos = False
-
-    else:
-        exibir_filtro_periodo_anos = True
-        st.sidebar.title("Filtro por Período de Anos:")
-        ano_selecionado = None
-
-        col1, col2 = st.sidebar.columns(2)  # Divide a linha em duas colunas para melhor layout
-
-        with col1:
-            ano_inicio = st.sidebar.number_input("Ano de Início", key=ano_inicio, min_value=2020, max_value=2025, step=1, value=2020)
-        with col2:
-            ano_fim = st.sidebar.number_input("Ano de Fim", key=ano_fim, min_value=2020, max_value=2025, step=1, value=2024)
-
-        # Validação básica para garantir que o ano de início não seja posterior ao ano de fim
-        if ano_inicio > ano_fim:
-            st.sidebar.error("Erro: O ano de início não pode ser posterior ao ano de fim.")
-            ano_inicio = None  # Reseta os valores para evitar processamento incorreto
-            ano_fim = None
-
-
-st.sidebar.write(f"Opção selecionada: {st.session_state.opcao_selecionada}")
+    exibir_filtro_periodo_anos = False
 
 if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-primeira_aba, segunda_aba, tab_03, tab_04, tab_05, tab_06, tab_detalhamento, aba_grid_mensal = st.tabs(
-  [
-    "Atvs - Geral",
-    "Atvs - Tipo",
-    "Atvs - Ranking",
-    "Atvs - Barras Empilhadas",
-    "Atvs - Fluxo",
-    "Atvs - Mapa de Calor",
-    "Atvs - Detalhamento",
-    "Atvs - Grid Mensal"
-  ]
+nova_aba, tab_detalhamento = st.tabs(
+  [ "Gráficos - Visão Geral", "Atvs - Detalhamento"]
 )
 
 # filtro
@@ -169,344 +134,197 @@ if st.session_state.ano_selecionado is None:
     df_selecionado = df_atividades_simplificado_2024
 else:
 
-    if st.session_state.ano_selecionado == 'Todos':
-        ano_selecionado1 = 'Todos'
-        df_selecionado = df_atividades_simplificado_todos
-
-    elif st.session_state.ano_selecionado == '2020':
+    if st.session_state.ano_selecionado == '2020':
         ano_selecionado1 = 2020
-        df_selecionado = df_atividades_simplificado_2020
-
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
     elif st.session_state.ano_selecionado == '2021':
         ano_selecionado1 = 2021
-        df_selecionado = df_atividades_simplificado_2021    
-
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
     elif st.session_state.ano_selecionado == '2022':
         ano_selecionado1 = 2022
-        df_selecionado = df_atividades_simplificado_2022    
-
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
     elif st.session_state.ano_selecionado == '2023':
         ano_selecionado1 = 2023
-        df_selecionado = df_atividades_simplificado_2023    
-
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
     elif st.session_state.ano_selecionado == '2024':
         ano_selecionado1 = 2024
-        df_selecionado = df_atividades_simplificado_2024    
-
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
     elif st.session_state.ano_selecionado == '2025':
         ano_selecionado1 = 2025
-        df_selecionado = df_atividades_simplificado_2025    
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
+    elif st.session_state.ano_selecionado == OPCAO_TODOS:
+        ano_selecionado1 = OPCAO_TODOS
+        df_selecionado = df_atividades_simplificado_todos
+
 
 # ==============================================================================
-with primeira_aba:
+with nova_aba:
 
-    titulo = f'Lista de Atividades (Geral)'
-    st.markdown(titulo, unsafe_allow_html=True)  
+    # ====== Linha 1 ======
+    with st.container():
 
-    lista_dfs_ano = [
-        (df_sumario_atvs_2020, 2020),
-        (df_sumario_atvs_2021, 2021),
-        (df_sumario_atvs_2022, 2022),
-        (df_sumario_atvs_2023, 2023),
-        (df_sumario_atvs_2024, 2024),
-        (df_sumario_atvs_2025, 2025),
-    ]
-    # ordena os registros pelo ano
-    lista_dfs_ano.sort(key=lambda x: x[1], reverse=True)
-
-    lista_registros = []
-    if ano_selecionado == 'Todos':
-        lista_registros = lista_dfs_ano
-    elif ano_selecionado == '2020':
-        lista_registros.append((df_sumario_atvs_2020, 2020))
-    elif ano_selecionado == '2021':
-        lista_registros.append((df_sumario_atvs_2021, 2021))
-    elif ano_selecionado == '2022':
-        lista_registros.append((df_sumario_atvs_2022, 2022))
-    elif ano_selecionado == '2023':
-        lista_registros.append((df_sumario_atvs_2023, 2023))
-    elif ano_selecionado == '2024':
-        lista_registros.append((df_sumario_atvs_2024, 2024))
-    elif ano_selecionado == '2025':
-        lista_registros.append((df_sumario_atvs_2025, 2025))        
-
-    for item in lista_registros:
-        df = item[0].copy()
-        df_ano = df.drop(columns=["Unnamed: 0","ano"])
-        df_ano['qtd'] = df_ano['qtd'].astype(int)
-        df_ano['mes'] = df_ano['mes'].apply(obter_mes_por_numero)
-        df_ano['calorias'] = df_ano['calorias'].round(2)
-
-        df_ano_grafico = df_ano.copy()
-        titulo = f'Atividades Físicas em {item[1]}'
-        grafico_atividades_ano_mes = gera_grafico_barras_atividades_mes(df_ano_grafico, titulo)
-
-        qtd = df_ano['qtd'].sum()
-        distancia = df_ano['distancia'].sum()
-        calorias = df_ano['calorias'].sum()
-        print(f'qtd => {qtd} | distancia =>  {distancia} | calorias => {calorias}')
-
-        df_ano_estatistica = pd.DataFrame(columns=['criterio','qtd','distancia','calorias'])
-        df_ano_estatistica.loc[0, 'criterio'] = 'Mínimo'
-        df_ano_estatistica.loc[0, 'qtd'] = df_ano['qtd'].min()
-        df_ano_estatistica.loc[0, 'distancia'] = df_ano['distancia'].min()
-        df_ano_estatistica.loc[0, 'calorias'] = df_ano['calorias'].min()
-
-        df_ano_estatistica.loc[1, 'criterio'] = 'Máximo'
-        df_ano_estatistica.loc[1, 'qtd'] = df_ano['qtd'].max()
-        df_ano_estatistica.loc[1, 'distancia'] = df_ano['distancia'].max()
-        df_ano_estatistica.loc[1, 'calorias'] = df_ano['calorias'].max()        
-
-        df_ano_estatistica.loc[2, 'criterio'] = 'Média'
-        df_ano_estatistica.loc[2, 'qtd'] = df_ano['qtd'].mean()
-        df_ano_estatistica.loc[2, 'distancia'] = df_ano['distancia'].mean()
-        df_ano_estatistica.loc[2, 'calorias'] = df_ano['calorias'].mean()                
-
-        index = df_ano.shape[0]+1
-        df_ano.loc[index,'mes'] = 'TOTAL'
-        df_ano.loc[index,'qtd'] = qtd
-        df_ano.loc[index,'distancia'] = distancia
-        df_ano.loc[index,'calorias'] = calorias
-
-        col1, col2 = st.columns(2)
+        ## Linha 1 - Gauges
+        #- Gauge: Qtd Total de Atividades
+        #- Gauge: Distância em Km das Atividades
+        #- Gauge: Qtd de Calorias Gastas das Atividades
+        #- Gauge: Tempo em min das Atividades
+        col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
-            st.markdown(f'<h2> {item[1]} </h2>', unsafe_allow_html=True)  
-            html_table_ano = df_ano.to_html(classes='estilo_tabela', index=False) 
-            st.markdown(css, unsafe_allow_html=True)
-            st.write(html_table_ano, unsafe_allow_html=True)
+            st.metric("Qtd Total de Atividades", df_selecionado.shape[0], "")
+
+            fig1 = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = df_selecionado.shape[0],
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Qtd Total de Atividades"}))
+            #st.plotly_chart(fig1, use_container_width=True)
 
         with col2:
-            st.altair_chart(grafico_atividades_ano_mes, use_container_width=False)
+            st.metric("Média Mensal", round(df_selecionado.shape[0]/12,1), "")
 
-# ==============================================================================
-with segunda_aba:
+            fig2 = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = round(df_selecionado.shape[0]/12,1),
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Média Mensal"}))
+            #st.plotly_chart(fig2, use_container_width=True)
 
-    # =======================================================
-    # aba 01
-    # =======================================================
-    titulo = f'<h3> Atividades por Tipo'
-    st.markdown(titulo, unsafe_allow_html=True)  
+        with col3:		
+            st.metric("Distância em Km", round(df_selecionado["Distance"].sum(), 1), "")
 
-    titulo = f'Atividades Físicas em {ano_selecionado1}'
-    st.write(f' Ano selecionado => {ano_selecionado1}') 
+            fig3 = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = round(df_selecionado["Distance"].sum(), 1),
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Distância em Km"}))
+            #st.plotly_chart(fig3, use_container_width=True)
+
+        with col4:
+            st.metric("Qtd de Calorias Gastas", round(df_selecionado["Calories"].sum(), 1), "")
+
+            fig4 = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = df_selecionado["Calories"].sum(),
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Qtd de Calorias Gastas"}))
+            #st.plotly_chart(fig4, use_container_width=True)
+
+        with col5:
+            st.metric("Tempo em min", round(df_selecionado["tempo_min"].sum(), 1), "")
+            fig5 = go.Figure(go.Indicator(
+                mode = "gauge+number",
+                value = df_selecionado["tempo_min"].sum(),
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Tempo em min"}))
+            #st.plotly_chart(fig5, use_container_width=True)
+            
+    st.markdown("---")
+
+    # ====== Linha 2 ====== 
+    col4, col5 = st.columns(2)
+
     if ano_selecionado1 != 'Todos':
-        df_filtro = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
+        df_filtro_pizza = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
+        df_filtro_barras = df_sumario_atvs_todos[(df_sumario_atvs_todos['ano'] == ano_selecionado1)]
+        titulo_barras = f'Atividades Físicas em {ano_selecionado1}'
     elif ano_selecionado1 == 'Todos':
-        df_filtro = df_atvs_tipo_todos
+        df_filtro_pizza = df_atvs_tipo_todos
+        df_filtro_barras = df_sumario_atvs_todos
+        titulo_barras = f'Atividades Físicas entre 2020 e 2025'
 
-    df_filtro2 = df_filtro.copy()
-    index_linha1 = df_filtro2.shape[0]+1
-    df_filtro2.loc[index_linha1,'tipo_atividade']='TOTAL'
-    total = df_filtro2['qtd'].sum()
-    df_filtro2.loc[index_linha1,'qtd']=total
-    df_filtro2.loc[index_linha1,'ano']=''
-
-    # Layout em duas colunas para melhor organização
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        html_table1 = df_filtro2.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
-        st.write(html_table1, unsafe_allow_html=True)
-        
+    with col4:
         # Gráfico de pizza para distribuição por tipo
         st.subheader("Distribuição de Atividades por Tipo")
-        grafico_pizza = grafico_pizza_tipo_atv(df_filtro)
+        grafico_pizza = grafico_pizza_tipo_atv(df_filtro_pizza)
         st.altair_chart(grafico_pizza, use_container_width=True)
 
-    with col2:
-        index_linha2 = df_sumario_2024.shape[0]+1
-        df_sumario_2024.loc[index_linha2,'mes']='TOTAL'
-        total_qtd = df_sumario_2024['qtd'].sum()
-        total_distancia = df_sumario_2024['distancia'].sum()
-        total_caloria = df_sumario_2024['calorias'].sum()
-        df_sumario_2024.loc[index_linha2,'qtd']=total
-        df_sumario_2024.loc[index_linha2,'distancia']=total_distancia
-        df_sumario_2024.loc[index_linha2,'calorias']=total_caloria
+    with col5:
+        st.subheader("Barras: Atividades Físicas por Ano")
+        grafico_atividades_ano_mes = gera_grafico_barras_atividades_mes(df_filtro_barras, titulo_barras)
+        st.altair_chart(grafico_atividades_ano_mes, use_container_width=False)
 
-        html_table2 = df_sumario_2024.to_html(classes='estilo_tabela', index=False) # index=False remove a coluna de índice
-        st.write(html_table2, unsafe_allow_html=True)
-        
-        # Gráfico de barras para tipos de exercício
-        st.subheader("Quantidade por Tipo de Exercício")
-        grafico_ano = gera_grafico_barras_tipo_exercicio(df_filtro, titulo)
-        st.altair_chart(grafico_ano, use_container_width=True)
+    # ====== Linha 3 ======
+    col6, col7 = st.columns(2)
 
-    # Seção de métricas importantes - números destacados
-    st.subheader("Métricas de Desempenho")
-    
-    # Criando uma linha com métricas principais
-    metrica1, metrica2, metrica3, metrica4 = st.columns(4)
-    
-    # Calculando métricas relevantes
-    if df_filtro is not None and not df_filtro.empty:
-        # Extrair e formatar métricas
-        total_atividades = total
-        media_por_mes = round(total / 12, 1) if ano_selecionado1 != 'Todos' else round(total / (len(df_filtro['ano'].unique()) * 12), 1)
-        
-        # Apresentando métricas em cards
-        with metrica1:
-            st.metric(label="Total de Atividades", value=f"{total_atividades}")
-        
-        with metrica2:
-            st.metric(label="Média Mensal", value=f"{media_por_mes}")
-        
-        with metrica3:
-            if 'distancia' in df_sumario_2024.columns:
-                total_distancia = round(total_distancia, 2)
-                st.metric(label="Distância Total (km)", value=f"{total_distancia}")
-        
-        with metrica4:
-            if 'calorias' in df_sumario_2024.columns:
-                total_calorias = round(total_caloria, 0)
-                st.metric(label="Calorias Totais", value=f"{total_calorias}")
-    
-    # Seção de análise de tendências
-    st.subheader("Análise de Tendências")
-    
-    # Criando abas para diferentes visualizações de tendências
-    tab_tendencia1, tab_tendencia2 = st.tabs(["Tendência por Período", "Comparação de Tipos"])
-    
-    with tab_tendencia1:
-        # Aqui podemos ver a evolução das atividades por período (dias da semana, meses)
+    #- Ranking das atividades por Tipo
+    with col6:
+
+        st.subheader("Ranking das Atividades Por Tipo")
+        titulo =f'Ranking de Atividades em {ano_selecionado1} por tipo'
+
         if ano_selecionado1 != 'Todos':
-            st.write("Distribuição de Atividades por Dia da Semana")
-            df_dia_semana = df_atvs_dia_semana_todos[df_atvs_dia_semana_todos['ano'] == ano_selecionado1]
-            grafico_dias_semana = gera_grafico_por_dia_semana(f"Atividades por Dia da Semana em {ano_selecionado1}", df_dia_semana)
-            st.altair_chart(grafico_dias_semana, use_container_width=True)
-        else:
-            st.write("Evolução de Atividades ao Longo dos Anos")
-            grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, "Evolução dos Tipos de Atividades ao Longo dos Anos")    
-            st.altair_chart(grafico_ranking_01, use_container_width=True)
-    
-    with tab_tendencia2:
-        # Comparação entre diferentes tipos de atividades
+            df_filtro_ranking_tipo = df_tipo_todos[(df_tipo_todos['ano'] == ano_selecionado1)]
+            grafico_ranking_01 = gera_grafico_ranking_tipo_02_ano_mes(df_filtro_ranking_tipo, titulo)    
+            
+        elif ano_selecionado1 == 'Todos':
+            titulo =f'Ranking de Atividades por tipo (2020 a 2025)'
+            grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
+
+        st.altair_chart(grafico_ranking_01, use_container_width=False)
+
+    #- Ranking das atividades por Dia da Semana
+    with col7:
+
+        st.subheader("Ranking das Atividades Por Dia Da Semana")
+        titulo =f'Ranking de Atividades em {ano_selecionado1} por dia da semana'
+
         if ano_selecionado1 != 'Todos':
-            st.write(f"Mapa de Calor por Tipo de Atividade em {ano_selecionado1}")
-            df_heatmap = df_atvs_tipo_todos[df_atvs_tipo_todos['ano'] == ano_selecionado1]
-            grafico_heatmap = gera_graficos_mapa_calor_por_tipo_atv(df_heatmap, f"Intensidade de Atividades por Tipo em {ano_selecionado1}")
-            st.altair_chart(grafico_heatmap, use_container_width=True)
-        else:
-            st.write("Comparação dos Tipos de Atividades ao Longo dos Anos")
-            grafico_fluxo = gera_graficos_fluxo_por_tipo("Fluxo de Atividades por Tipo ao Longo dos Anos", df_atvs_tipo_todos)
-            st.altair_chart(grafico_fluxo, use_container_width=True)
-            
-    # Análise de progresso
-    st.subheader("Análise de Progresso")
-    
-    # Seção para mostrar o progresso comparando períodos
-    if ano_selecionado1 != 'Todos' and int(ano_selecionado1) > 2020:
-        ano_anterior = int(ano_selecionado1) - 1
-        
-        df_ano_atual = df_atvs_tipo_todos[df_atvs_tipo_todos['ano'] == ano_selecionado1]
-        df_ano_anterior = df_atvs_tipo_todos[df_atvs_tipo_todos['ano'] == ano_anterior]
-        
-        if not df_ano_anterior.empty and not df_ano_atual.empty:
-            total_atual = df_ano_atual['qtd'].sum()
-            total_anterior = df_ano_anterior['qtd'].sum()
-            
-            variacao = ((total_atual - total_anterior) / total_anterior) * 100 if total_anterior > 0 else 100
-            
-            st.write(f"### Comparação com {ano_anterior}")
-            col_prog1, col_prog2 = st.columns(2)
-            
-            with col_prog1:
-                st.metric(
-                    label=f"Variação de Atividades em relação a {ano_anterior}", 
-                    value=f"{total_atual}",
-                    delta=f"{variacao:.1f}%"
-                )
-            
-            with col_prog2:
-                # Agrupamento para comparativo
-                df_comparativo = pd.DataFrame({
-                    'Ano': [str(ano_anterior), str(ano_selecionado1)],
-                    'Total': [total_anterior, total_atual]
-                })
-                
-                # Gráfico de barras comparativo
-                grafico_comparativo = alt.Chart(df_comparativo).mark_bar().encode(
-                    x=alt.X('Ano:N', title='Ano'),
-                    y=alt.Y('Total:Q', title='Total de Atividades'),
-                    color=alt.Color('Ano:N', legend=None),
-                    tooltip=['Ano', 'Total']
-                ).properties(
-                    title="Comparativo de Atividades entre Anos",
-                    width=300,
-                    height=300
-                ).interactive()
-                
-                st.altair_chart(grafico_comparativo, use_container_width=True)
-    else:
-        st.info("Selecione um ano específico posterior a 2020 para ver análise comparativa de progresso.")
+            df_filtro_ranking_dia_semana = df_dia_semana_todos[(df_dia_semana_todos['ano'] == ano_selecionado1)]
+            grafico_ranking_02 = gera_grafico_ranking_dia_semana_02_ano_mes(df_filtro_ranking_dia_semana, titulo)
 
-# ==============================================================================
-with tab_03:
+        elif ano_selecionado1 == 'Todos':
+            titulo =f'Ranking de Atividades por dia da semana entre {ano_inicio} e {ano_fim}'
+            grafico_ranking_02 = gera_grafico_ranking_dia_semana_01(df_atvs_dia_semana_todos, titulo)
 
-    # =======================================================
-    # aba 03
-    # =======================================================
-    titulo = f'<h3> Atividades por Ranking'
-    st.markdown(titulo, unsafe_allow_html=True)  
+        st.altair_chart(grafico_ranking_02, use_container_width=False)
 
-    titulo =f'Ranking de Atividades por tipo (2020 a 2025)'
-    grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
-    st.altair_chart(grafico_ranking_01, use_container_width=False)
+    # ====== Linha 4 ======
+    col8, col9 = st.columns(2)
 
-    titulo =f'Ranking de Atividades por dia da semana (2020 a 2025)'
-    grafico_ranking_02 = gera_grafico_ranking_dia_semana_01(df_atvs_dia_semana_todos, titulo)
-    st.altair_chart(grafico_ranking_02, use_container_width=False)
+    if ano_selecionado1 != 'Todos':
+        df_filtro_tipo = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
+        df_dia_semana = df_atvs_dia_semana_todos[(df_atvs_dia_semana_todos['ano'] == ano_selecionado1)]
+    elif ano_selecionado1 == 'Todos':
+        df_filtro_tipo = df_atvs_tipo_todos
+        df_dia_semana = df_atvs_dia_semana_todos
 
-# ==============================================================================
-with tab_04:
+    with col8:
+        st.subheader(f"Atividades Por Tipo em {ano_selecionado1}")
+        titulo =f'Atividades Por Tipo em {ano_selecionado1}'
+        grafico_barras_emp_01 = grafico_barras_empilhadas_por_tipo(titulo, df_filtro_tipo)    
+        st.altair_chart(grafico_barras_emp_01, use_container_width=False)
 
-    # =======================================================
-    # aba 04
-    # =======================================================
-    titulo = f'<h3> Atividades por Barras Empilhadas'
-    st.markdown(titulo, unsafe_allow_html=True)  
+    with col9:
+        st.subheader(f"Atividades Por Dia da Semana em {ano_selecionado1}")
+        titulo =f'Atividades Por Dia da Semana em {ano_selecionado1}'
+        grafico_barras_emp_02 = grafico_barras_empilhadas_por_dia_semana(titulo, df_dia_semana)    
+        st.altair_chart(grafico_barras_emp_02, use_container_width=False)
 
-    titulo =f'Barras Empilhadas de Atividades por tipo (2020 a 2025)'
-    grafico_barras_emp_01 = grafico_barras_empilhadas_por_tupo(titulo, df_atvs_tipo_todos)    
-    st.altair_chart(grafico_barras_emp_01, use_container_width=False)
 
-    titulo =f'Barras Empilhadas de Atividades por dia da semana (2020 a 2025)'
-    grafico_barras_emp_02 = grafico_barras_empilhadas_por_dia_semana(titulo, df_atvs_dia_semana_todos)    
-    st.altair_chart(grafico_barras_emp_02, use_container_width=False)
+    # ====== Linha 4 ======
+    col10, col11 = st.columns(2)
 
-# ==============================================================================
-with tab_05:
+    if st.session_state.ano_selecionado == OPCAO_TODOS:
+        df_filtro_mapa_tipo = df_atvs_tipo_todos
+        df_filtro_mapa_dia_semana = df_atvs_dia_semana_todos
+        titulo_tipo =f'Mapa de Calor por Tipo de Atividades entre 2020 e 2025'
+        titulo_dia_semana =f'Mapa de Calor por Dia da Semana entre 2020 e 2025'
 
-    # =======================================================
-    # aba 05
-    # =======================================================
-    titulo = f'<h3> Atividades por Fluxo de Dados'
-    st.markdown(titulo, unsafe_allow_html=True)  
+    elif st.session_state.ano_selecionado != OPCAO_TODOS:
+        df_filtro_mapa_tipo = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
+        df_filtro_mapa_dia_semana = df_atvs_dia_semana_todos[(df_atvs_dia_semana_todos['ano'] == ano_selecionado1)]
+        titulo_tipo =f'Mapa de Calor por Tipo de Atividades em {ano_selecionado1}'
+        titulo_dia_semana =f'Mapa de Calor por Dia da Semana em {ano_selecionado1}'
 
-    titulo =f'Fluxo de Atividades por tipo (2020 a 2025)'
-    grafico_fluxo_01 = gera_graficos_fluxo_por_tipo(titulo, df_atvs_tipo_todos)    
-    st.altair_chart(grafico_fluxo_01, use_container_width=False)
+    with col10:
+        st.subheader(f'Mapa de Calor por Tipo de Atividades em {ano_selecionado1}')
+        grafico_mapa_calor_01 = gera_graficos_mapa_calor_por_tipo_atv(df_filtro_mapa_tipo, titulo_tipo)
+        st.altair_chart(grafico_mapa_calor_01, use_container_width=False)
 
-    titulo =f'Fluxo de Atividades por dia da semana (2020 a 2025)'
-    grafico_fluxo_02 = gera_graficos_fluxo_por_dia_semana(titulo, df_atvs_dia_semana_todos)    
-    st.altair_chart(grafico_fluxo_02, use_container_width=False)
-
-# ==============================================================================
-with tab_06:
-
-    # =======================================================
-    # aba 06
-    # =======================================================
-    titulo = f'<h3> Atividades por Mapa de Calor'
-    st.markdown(titulo, unsafe_allow_html=True)  
-
-    titulo =f'Mapa de Calor por Tipo de Atividades (2020 a 2025)'
-    grafico_mapa_calor_01 = gera_graficos_mapa_calor_por_tipo_atv(df_atvs_tipo_todos, titulo)
-    st.altair_chart(grafico_mapa_calor_01, use_container_width=False)
-
-    titulo =f'Mapa de Calor por Dia da Semana (2020 a 2025)'
-    grafico_mapa_calor_02 = gera_graficos_mapa_calor_por_dia_semana_atv(df_atvs_dia_semana_todos, titulo)
-    st.altair_chart(grafico_mapa_calor_02, use_container_width=False)
-
+    with col11:
+        st.subheader(f'Mapa de Calor por Dia da Semana em {ano_selecionado1}')
+        grafico_mapa_calor_02 = gera_graficos_mapa_calor_por_dia_semana_atv(df_filtro_mapa_dia_semana, titulo_dia_semana)
+        st.altair_chart(grafico_mapa_calor_02, use_container_width=False)
 # ==============================================================================
 with tab_detalhamento:
 
@@ -793,169 +611,4 @@ with tab_detalhamento:
             st.error("Não foi possível exibir os dados. Nenhuma coluna essencial encontrada.")
     else:
         st.warning("Não há dados disponíveis para os filtros selecionados.")
-# ==============================================================================
-with aba_grid_mensal:
-
-    # =======================================================
-    # Grid Mensal - exibindo 12 gráficos em grid 3x4
-    # =======================================================
-    titulo = f'<h3>Atividades Físicas - Grid Mensal</h3>'
-    st.markdown(titulo, unsafe_allow_html=True)  
-
-    if ano_selecionado1 != 'Todos':
-        st.write(f"### Atividades de {ano_selecionado1} organizadas por mês")
-        
-        # Função para criar um gráfico mensal com tamanho reduzido
-        def gera_grafico_compacto_mes(mes, df, ano):
-            nome_mes = obter_mes_por_numero(mes)
-            titulo = f'{nome_mes} de {ano}'
-            df_filtro = agrupamento_atividade_por_tipo_por_ano_mes(df, ano, mes)
-
-            # Criar gráfico mais compacto para caber no grid
-            grafico_mes = alt.Chart(df_filtro).mark_bar().encode(
-                x=alt.X('tipo_atividade:N', title='Tipo', axis=alt.Axis(labelAngle=-45, labelFontSize=10)),
-                y=alt.Y('qtd:Q', title='Qtd'),
-                tooltip=['tipo_atividade', 'qtd'],      
-                color=alt.Color('tipo_atividade:N', title='Tipo de Atividade')     
-            ).properties(
-                title=alt.Title(
-                    text=titulo,
-                    fontSize=14
-                ),
-                width=300,
-                height=200
-            ).interactive()
-            
-            return grafico_mes, df_filtro
-        
-        # Criar layout de grid 3x4 (3 colunas, 4 linhas)
-        # Linha 1 (Jan, Fev, Mar)
-        row1_col1, row1_col2, row1_col3 = st.columns(3)
-        
-        # Linha 2 (Abr, Mai, Jun)
-        row2_col1, row2_col2, row2_col3 = st.columns(3)
-        
-        # Linha 3 (Jul, Ago, Set)
-        row3_col1, row3_col2, row3_col3 = st.columns(3)
-        
-        # Linha 4 (Out, Nov, Dez)
-        row4_col1, row4_col2, row4_col3 = st.columns(3)
-        
-        # Linha 1: Janeiro, Fevereiro, Março
-        with row1_col1:
-            grafico_jan, df_jan = gera_grafico_compacto_mes(1, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_jan, use_container_width=True)
-            with st.expander("Dados Janeiro"):
-                st.dataframe(df_jan, use_container_width=True)
-        
-        with row1_col2:
-            grafico_fev, df_fev = gera_grafico_compacto_mes(2, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_fev, use_container_width=True)
-            with st.expander("Dados Fevereiro"):
-                st.dataframe(df_fev, use_container_width=True)
-        
-        with row1_col3:
-            grafico_mar, df_mar = gera_grafico_compacto_mes(3, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_mar, use_container_width=True)
-            with st.expander("Dados Março"):
-                st.dataframe(df_mar, use_container_width=True)
-        
-        # Linha 2: Abril, Maio, Junho
-        with row2_col1:
-            grafico_abr, df_abr = gera_grafico_compacto_mes(4, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_abr, use_container_width=True)
-            with st.expander("Dados Abril"):
-                st.dataframe(df_abr, use_container_width=True)
-        
-        with row2_col2:
-            grafico_mai, df_mai = gera_grafico_compacto_mes(5, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_mai, use_container_width=True)
-            with st.expander("Dados Maio"):
-                st.dataframe(df_mai, use_container_width=True)
-        
-        with row2_col3:
-            grafico_jun, df_jun = gera_grafico_compacto_mes(6, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_jun, use_container_width=True)
-            with st.expander("Dados Junho"):
-                st.dataframe(df_jun, use_container_width=True)
-        
-        # Linha 3: Julho, Agosto, Setembro
-        with row3_col1:
-            grafico_jul, df_jul = gera_grafico_compacto_mes(7, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_jul, use_container_width=True)
-            with st.expander("Dados Julho"):
-                st.dataframe(df_jul, use_container_width=True)
-        
-        with row3_col2:
-            grafico_ago, df_ago = gera_grafico_compacto_mes(8, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_ago, use_container_width=True)
-            with st.expander("Dados Agosto"):
-                st.dataframe(df_ago, use_container_width=True)
-        
-        with row3_col3:
-            grafico_set, df_set = gera_grafico_compacto_mes(9, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_set, use_container_width=True)
-            with st.expander("Dados Setembro"):
-                st.dataframe(df_set, use_container_width=True)
-        
-        # Linha 4: Outubro, Novembro, Dezembro
-        with row4_col1:
-            grafico_out, df_out = gera_grafico_compacto_mes(10, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_out, use_container_width=True)
-            with st.expander("Dados Outubro"):
-                st.dataframe(df_out, use_container_width=True)
-        
-        with row4_col2:
-            grafico_nov, df_nov = gera_grafico_compacto_mes(11, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_nov, use_container_width=True)
-            with st.expander("Dados Novembro"):
-                st.dataframe(df_nov, use_container_width=True)
-        
-        with row4_col3:
-            grafico_dez, df_dez = gera_grafico_compacto_mes(12, df_selecionado, ano_selecionado1)
-            st.altair_chart(grafico_dez, use_container_width=True)
-            with st.expander("Dados Dezembro"):
-                st.dataframe(df_dez, use_container_width=True)
-        
-        # Adicionar um resumo anual abaixo do grid
-        st.write("### Resumo Anual")
-        
-        # Obter dados de todos os meses e combinar
-        df_anual = pd.concat([df_jan, df_fev, df_mar, df_abr, df_mai, df_jun, 
-                               df_jul, df_ago, df_set, df_out, df_nov, df_dez])
-        
-        # Agrupar por tipo de atividade para obter o total anual
-        df_total_por_tipo = df_anual.groupby('tipo_atividade')['qtd'].sum().reset_index()
-        df_total_por_tipo['mes'] = 'Total Anual'
-        df_total_por_tipo['ano'] = ano_selecionado1
-        
-        # Gráfico de resumo anual (maior e mais detalhado)
-        grafico_anual = alt.Chart(df_total_por_tipo).mark_bar().encode(
-            x=alt.X('tipo_atividade:N', title='Tipo de Atividade'),
-            y=alt.Y('qtd:Q', title='Quantidade Total de Atividades'),
-            tooltip=['tipo_atividade', 'qtd'],      
-            color=alt.Color('tipo_atividade:N', title='Tipo de Atividade')     
-        ).properties(
-            title=alt.Title(
-                text=f'Resumo Anual de Atividades - {ano_selecionado1}'
-            ),
-            width=800,
-            height=400
-        ).interactive()
-        
-        # Exibir gráfico anual e dados
-        st.altair_chart(grafico_anual, use_container_width=True)
-        
-        # Adicionar tabela com dados anuais
-        with st.expander("Dados do Resumo Anual"):
-            # Adicionar uma linha com o total geral
-            total_geral = df_total_por_tipo['qtd'].sum()
-            df_total_com_soma = df_total_por_tipo.copy()
-            df_total_com_soma.loc[len(df_total_com_soma)] = ['TOTAL', total_geral, 'Total Anual', ano_selecionado1]
-            
-            st.dataframe(df_total_com_soma, use_container_width=True)
-        
-    else:
-        st.warning("Selecione um ano específico para visualizar o grid mensal de atividades.")
-        st.info("Esta funcionalidade não está disponível para a opção 'Todos'.")
 # ==============================================================================

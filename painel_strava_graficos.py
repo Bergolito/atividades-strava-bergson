@@ -20,11 +20,14 @@ lista_cores_graficos = [
 # =======================================================
 # Gráficos de pizza
 # =======================================================
-def grafico_pizza_tipo_atv(df_atvs):
+def grafico_pizza_tipo_atv(df_atvs, width=600, height=400):
 
-    grafico = alt.Chart(df_atvs).mark_arc().encode(
+    grafico = alt.Chart(df_atvs).mark_arc(innerRadius=50).encode(
         theta="qtd",
         color=alt.Color('tipo_atividade:N', title='Tipo de Atividade')     
+        
+    ).properties(
+        width=width, height=height
     )   
 
     return grafico
@@ -54,7 +57,7 @@ def gera_grafico_barras_tipo_exercicio(df_filtro, titulo):
 def gera_grafico_barras_atividades_mes(df_filtro, titulo):
 
     grafico = alt.Chart(df_filtro).mark_bar().encode(
-        x=alt.X('mes:N', title='Mês'),
+        x=alt.X('mes:Q', title='Mês'),
         y=alt.Y('qtd:Q', title='Quantidade de Atividades'),
         tooltip=['mes', 'qtd'],      
         color=alt.Color('mes:N', title='Mês')     
@@ -62,8 +65,8 @@ def gera_grafico_barras_atividades_mes(df_filtro, titulo):
         title=alt.Title(
             text=titulo
         ),
-        width=700,
-        height=500
+        width=600,
+        height=400
     ).interactive()
 
     return grafico    
@@ -102,28 +105,28 @@ def gera_graficos_fluxo_por_dia_semana(titulo, df_atividades):
 # =======================================================
 # Gráficos de Barra Empilhadas
 # =======================================================
-def grafico_barras_empilhadas_por_tupo(titulo, df):
+def grafico_barras_empilhadas_por_tipo(titulo, df, width=600, height=400):
 
     grafico = alt.Chart(df).mark_bar(width=20).encode(
         alt.X('ano:N', title='Ano'),
         alt.Y('sum(qtd)', title='Soma das Quantidades'),
         alt.Color('tipo_atividade', title='Tipo Atividade')
     ).properties(
-            title=titulo,
-            width=800, height=600
+        title=titulo,
+        width=width, height=height
     ).interactive()   
     
     return grafico
 # =======================================================
-def grafico_barras_empilhadas_por_dia_semana(titulo, df):
+def grafico_barras_empilhadas_por_dia_semana(titulo, df, width=600, height=400):
 
     grafico = alt.Chart(df).mark_bar(width=20).encode(
         alt.X('ano:N', title='Ano'),
         alt.Y('sum(qtd)', title='Soma das Quantidades'),
         alt.Color('dia_semana', title='Dia da Semana')
     ).properties(
-            title=titulo,
-            width=800, height=600
+        title=titulo,
+        width=width, height=height
     ).interactive()   
     
     return grafico
@@ -133,7 +136,7 @@ def grafico_barras_empilhadas_por_dia_semana(titulo, df):
 # =======================================================
 # Gráficos de Mapa de Calor (Heatmap)
 # =======================================================
-def gera_graficos_mapa_calor_por_tipo_atv(df_atividades, titulo):
+def gera_graficos_mapa_calor_por_tipo_atv(df_atividades, titulo, width=600, height=400):
                                             
     heatmap = alt.Chart(df_atividades).mark_rect().encode(
         x=alt.X('ano:O', title=None, axis=alt.Axis(orient='top')),  # Define a orientação do eixo x como 'top'
@@ -150,14 +153,13 @@ def gera_graficos_mapa_calor_por_tipo_atv(df_atividades, titulo):
 
     # Combina o gráfico de calor com o texto
     heatmap_with_text = (heatmap + text).properties(
-        width=800,
-        height=600,
+        width=width, height=height,
         title=titulo
     )
 
     return heatmap_with_text                                    
 # ==========================================================================
-def gera_graficos_mapa_calor_por_dia_semana_atv(df_atividades, titulo):
+def gera_graficos_mapa_calor_por_dia_semana_atv(df_atividades, titulo, width=600, height=400):
                                             
     heatmap = alt.Chart(df_atividades).mark_rect().encode(
         x=alt.X('ano:O', title=None, axis=alt.Axis(orient='top')),  # Define a orientação do eixo x como 'top'
@@ -174,8 +176,7 @@ def gera_graficos_mapa_calor_por_dia_semana_atv(df_atividades, titulo):
 
     # Combina o gráfico de calor com o texto
     heatmap_with_text = (heatmap + text).properties(
-        width=800,
-        height=600,
+        width=width, height=height,
         title=titulo
     )
 
@@ -203,16 +204,16 @@ def gera_grafico_por_dia_semana(titulo, contagem_por_dia_semana):
 
     return chart
 # =======================================================    
-def grafico_barras_empilhadas_por_dia_semana(titulo, df):
+def grafico_barras_empilhadas_por_dia_semana(titulo, df, width=600, height=400):
         
     grafico = alt.Chart(df).mark_bar(width=20).encode(
         alt.X('ano:N', title='Ano'),
         alt.Y('sum(qtd)', title='Soma das Quantidades'),
         alt.Color('dia_semana', title='Dia da Semana')
     ).properties(
-            title=titulo,
-            width=800, height=600
-    ).interactive()   
+        title=titulo,
+        width=width, height=height
+    ).interactive()
 
     return grafico
 # ==========================================================================
@@ -237,13 +238,32 @@ def gera_grafico_ranking_tipo_01(df_atividades, titulo):
         groupby=["ano"]
     ).properties(
         title=titulo,
-        width=800,
-        height=600,
+        width=600,
+        height=400,
     )
 
     return grafico
 # ==========================================================================
-def gera_grafico_ranking_dia_semana_01(df_atividades, titulo):
+def gera_grafico_ranking_tipo_02_ano_mes(df_atividades, titulo, width=600, height=400):
+
+    grafico = alt.Chart(df_atividades).mark_line(point=True).encode(
+        x=alt.X('mes:O', title='Mês'),
+        y=alt.Y("rank:O", title='Posição do Ranking'),
+        color=alt.Color("tipo_atividade:N", title='Tipo') 
+    ).transform_window(
+        rank="rank()",
+        sort=[alt.SortField("qtd", order="descending")],
+        groupby=["mes"]
+    ).properties(
+        title=titulo,
+        width=width,
+        height=height,
+    )
+
+    return grafico
+
+# ==========================================================================
+def gera_grafico_ranking_dia_semana_01(df_atividades, titulo, width=600, height=400):
 
     grafico_ranking_01 = alt.Chart(df_atividades).mark_line(point=True).encode(
         x=alt.X('ano:O', title='Ano'),
@@ -255,10 +275,28 @@ def gera_grafico_ranking_dia_semana_01(df_atividades, titulo):
         groupby=["ano"]
     ).properties(
         title=titulo,
-        width=800, height=600,
+        width=width, height=height,
     )
 
     return grafico_ranking_01
+# ==========================================================================
+def gera_grafico_ranking_dia_semana_02_ano_mes(df_atividades, titulo, width=600, height=400):
+
+    grafico_ranking_01 = alt.Chart(df_atividades).mark_line(point=True).encode(
+        x=alt.X('mes:O', title='Mês'),
+        y=alt.Y("rank:O", title='Posição do Ranking'),
+        color=alt.Color("dia_semana:N", title="Dia da Semana")
+    ).transform_window(
+        rank="rank()",
+        sort=[alt.SortField("qtd", order="descending")],
+        groupby=["mes"]
+    ).properties(
+        title=titulo,
+        width=width, height=height,
+    )
+
+    return grafico_ranking_01
+
 # ==========================================================================
 def gera_grafico_ranking_diasemana_02(df_acidentes_geral_por_dia_semana):
 
