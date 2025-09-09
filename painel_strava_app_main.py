@@ -541,7 +541,7 @@ with tab_detalhamento:
                 if isinstance(filename, str) and filename.startswith('activities/'):
                     # Extrair ID do arquivo
                     tcx_id = filename.replace('activities/', '').split('.')[0]
-                    print(f"tcx_id => {tcx_id}")
+                    #print(f"tcx_id => {tcx_id}")
                 
                 # Verificar se existe arquivo TCX na pasta 'arquivos-ok'
                 if tcx_id:
