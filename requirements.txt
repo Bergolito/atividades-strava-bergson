@@ -9,3 +9,4 @@ vega_datasets
 folium
 vegafusion[embed]
 gpxpy
+plotly
