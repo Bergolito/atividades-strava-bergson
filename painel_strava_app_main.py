@@ -69,6 +69,9 @@ df_dia_semana_todos = pd.read_csv('datasets/gerais/atividades_geral_por_dia_sema
 # CSS para estilizar a tabela
 css = """
     <style>
+    [data-testid="stAppHeader"] {
+        background-color: #1c9ea0 !important;
+    }
     [data-testid="stSidebar"] {
         background-color: #1c9ea0 !important;
     }
@@ -79,7 +82,7 @@ css = """
         background-color: #fff;
         border-radius: 8px;
         padding: 8px;
-    }   
+    } 
     </style>
 """
 
@@ -109,9 +112,6 @@ with st.sidebar:
         opcoes_anos, index=1,
         key="ano_selecionado"
     )
-
-    #print(f'Ano Selecionado = {ano_selecionado}')
-    #st.write(f'Ano Selecionado = {ano_selecionado}', unsafe_allow_html=True)
 
     st.write(PULA_LINHAS, unsafe_allow_html=True)
     st.image("images/logotipo.png", width=240)
