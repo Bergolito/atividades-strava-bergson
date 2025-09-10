@@ -72,6 +72,9 @@ css = """
     [data-testid="stAppHeader"] {
         background-color: #1c9ea0 !important;
     }
+    #[data-testid="stSidebar"] {
+    #    background-color: #1c9ea0 !important;
+    #}
     [data-testid="stAppViewContainer"] {
         background-color: #1c9ea0 !important;
     }
@@ -96,8 +99,6 @@ ano_fim = lista_anos[0]
 
 opcoes_anos = [OPCAO_TODOS] + [str(ano) for ano in lista_anos]
 
-# ===============================================================================
-# Cabeçalho do dashboard
 with st.container():
 
     col1, col2, col3 = st.columns(3)
@@ -113,7 +114,24 @@ with st.container():
             key="ano_selecionado"
         )
 
-# ===============================================================================
+#exibir_filtro_periodo_anos = False
+
+
+#with st.sidebar:
+#    st.header("Filtros:")
+    
+#    ano_selecionado = st.sidebar.selectbox(
+#        'Qual o ano deseja visualizar?',
+#        opcoes_anos, index=1,
+#        key="ano_selecionado"
+#    )
+
+#    st.write(PULA_LINHAS, unsafe_allow_html=True)
+#    st.image("images/logotipo.png", width=240)
+#    st.write(PULA_LINHAS, unsafe_allow_html=True)
+
+#    exibir_filtro_periodo_anos = False
+
 if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
