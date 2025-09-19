@@ -4,9 +4,13 @@
 import pandas as pd
 import streamlit as st
 import folium
+import gpxpy
 import plotly.graph_objects as go
+import plotly.express as px
+from datetime import datetime
+import numpy as np
 
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium
 from painel_strava_funcoes import *
 from painel_strava_graficos import *
 
@@ -118,8 +122,8 @@ if 'ano_selecionado' not in st.session_state:
     st.session_state.ano_selecionado = None
 
 # Definição de abas
-nova_aba, tab_detalhamento = st.tabs(
-  [ "Gráficos - Visão Geral", "Atvs - Detalhamento"]
+nova_aba, tab_detalhamento, tab_corrida = st.tabs(
+  [ "Gráficos - Visão Geral", "Atvs - Detalhamento", "Corrida"]
 )
 
 # filtro
@@ -167,51 +171,17 @@ with nova_aba:
         with col1:
             st.metric("Qtd Total de Atividades", df_selecionado.shape[0], "")
 
-            fig1 = go.Figure(go.Indicator(
-                mode = "gauge+number",
-                value = df_selecionado.shape[0],
-                domain = {'x': [0, 1], 'y': [0, 1]},
-                title = {'text': "Qtd Total de Atividades"}))
-            #st.plotly_chart(fig1, use_container_width=True)
-
         with col2:
             st.metric("Média Mensal", round(df_selecionado.shape[0]/12,1), "")
-
-            fig2 = go.Figure(go.Indicator(
-                mode = "gauge+number",
-                value = round(df_selecionado.shape[0]/12,1),
-                domain = {'x': [0, 1], 'y': [0, 1]},
-                title = {'text': "Média Mensal"}))
-            #st.plotly_chart(fig2, use_container_width=True)
 
         with col3:		
             st.metric("Distância em Km", round(df_selecionado["Distance"].sum(), 1), "")
 
-            fig3 = go.Figure(go.Indicator(
-                mode = "gauge+number",
-                value = round(df_selecionado["Distance"].sum(), 1),
-                domain = {'x': [0, 1], 'y': [0, 1]},
-                title = {'text': "Distância em Km"}))
-            #st.plotly_chart(fig3, use_container_width=True)
-
         with col4:
             st.metric("Qtd de Calorias Gastas", round(df_selecionado["Calories"].sum(), 1), "")
 
-            fig4 = go.Figure(go.Indicator(
-                mode = "gauge+number",
-                value = df_selecionado["Calories"].sum(),
-                domain = {'x': [0, 1], 'y': [0, 1]},
-                title = {'text': "Qtd de Calorias Gastas"}))
-            #st.plotly_chart(fig4, use_container_width=True)
-
         with col5:
             st.metric("Tempo em min", round(df_selecionado["tempo_min"].sum(), 1), "")
-            fig5 = go.Figure(go.Indicator(
-                mode = "gauge+number",
-                value = df_selecionado["tempo_min"].sum(),
-                domain = {'x': [0, 1], 'y': [0, 1]},
-                title = {'text': "Tempo em min"}))
-            #st.plotly_chart(fig5, use_container_width=True)
             
     st.markdown("---")
 
@@ -591,7 +561,7 @@ with tab_detalhamento:
                                     ).add_to(m)
                                     
                                     # Exibir o mapa
-                                    folium_static(m, width=900)
+                                    st_folium(m, width=900, returned_objects=[])
                                     
                                 else:
                                     st.warning("O arquivo CSV não contém coordenadas de latitude e longitude.")
@@ -606,4 +576,288 @@ with tab_detalhamento:
             st.error("Não foi possível exibir os dados. Nenhuma coluna essencial encontrada.")
     else:
         st.warning("Não há dados disponíveis para os filtros selecionados.")
+
+# ==============================================================================
+with tab_corrida:
+    
+    # =======================================================
+    # Aba Corrida - Análise do Evening Run
+    # =======================================================
+    st.title("🏃 Análise da Corrida - Evening Run")
+    
+    # Função para processar arquivo GPX
+    def processar_gpx(caminho_arquivo):
+        """Processa arquivo GPX e retorna dataframe com os dados"""
+        try:
+            with open(caminho_arquivo, 'r') as gpx_file:
+                gpx = gpxpy.parse(gpx_file)
+            
+            dados = []
+            for track in gpx.tracks:
+                for segment in track.segments:
+                    for point in segment.points:
+                        # Extrair dados básicos
+                        row = {
+                            'latitude': point.latitude,
+                            'longitude': point.longitude,
+                            'elevation': point.elevation if point.elevation else 0,
+                            'time': point.time
+                        }
+                        
+                        # Extrair extensões (frequência cardíaca e cadência)
+                        if point.extensions:
+                            for extension in point.extensions:
+                                for child in extension:
+                                    if 'hr' in child.tag:
+                                        row['heart_rate'] = int(child.text) if child.text else None
+                                    elif 'cad' in child.tag:
+                                        row['cadence'] = int(child.text) if child.text else None
+                        
+                        dados.append(row)
+            
+            df = pd.DataFrame(dados)
+            
+            # Calcular métricas adicionais
+            if len(df) > 1:
+                # Calcular distâncias entre pontos consecutivos
+                distances = []
+                speeds = []
+                time_diffs = []
+                
+                for i in range(1, len(df)):
+                    # Distância usando fórmula de Haversine
+                    lat1, lon1 = df.iloc[i-1]['latitude'], df.iloc[i-1]['longitude']
+                    lat2, lon2 = df.iloc[i]['latitude'], df.iloc[i]['longitude']
+                    
+                    # Conversão para radianos
+                    lat1_rad, lon1_rad = np.radians(lat1), np.radians(lon1)
+                    lat2_rad, lon2_rad = np.radians(lat2), np.radians(lon2)
+                    
+                    # Fórmula de Haversine
+                    dlat = lat2_rad - lat1_rad
+                    dlon = lon2_rad - lon1_rad
+                    a = np.sin(dlat/2)**2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon/2)**2
+                    c = 2 * np.arcsin(np.sqrt(a))
+                    distance = 6371 * c * 1000  # Distância em metros
+                    
+                    distances.append(distance)
+                    
+                    # Calcular diferença de tempo
+                    if df.iloc[i]['time'] and df.iloc[i-1]['time']:
+                        time_diff = (df.iloc[i]['time'] - df.iloc[i-1]['time']).total_seconds()
+                        time_diffs.append(time_diff)
+                        
+                        # Calcular velocidade (m/s -> km/h)
+                        if time_diff > 0:
+                            speed = (distance / time_diff) * 3.6
+                            speeds.append(speed)
+                        else:
+                            speeds.append(0)
+                    else:
+                        time_diffs.append(0)
+                        speeds.append(0)
+                
+                # Adicionar dados ao DataFrame
+                df['distance_m'] = [0] + distances
+                df['speed_kmh'] = [0] + speeds
+                df['time_diff'] = [0] + time_diffs
+                df['cumulative_distance'] = df['distance_m'].cumsum() / 1000  # km
+                df['cumulative_time'] = df['time_diff'].cumsum() / 60  # minutos
+            
+            return df
+            
+        except Exception as e:
+            st.error(f"Erro ao processar arquivo GPX: {str(e)}")
+            return None
+    
+    # Carregar dados do GPX
+    caminho_gpx = "dados-corrida/Evening_Run.gpx"
+    df_corrida = processar_gpx(caminho_gpx)
+    
+    if df_corrida is not None and not df_corrida.empty:
+        
+        # Mostrar informações das imagens de referência
+        st.subheader("📊 Visualizações baseadas nos dados de referência:")
+        col_img1, col_img2, col_img3, col_img4 = st.columns(4)
+        
+        with col_img1:
+            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", use_container_width=True)
+        with col_img2:
+            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", use_container_width=True)
+        with col_img3:
+            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", use_container_width=True)
+        with col_img4:
+            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", use_container_width=True)
+        
+        st.markdown("---")
+        
+        # Métricas principais
+        st.subheader("📈 Métricas da Corrida")
+        
+        # Calcular métricas
+        distancia_total = df_corrida['cumulative_distance'].max()
+        tempo_total = df_corrida['cumulative_time'].max()
+        velocidade_media = df_corrida[df_corrida['speed_kmh'] > 0]['speed_kmh'].mean()
+        velocidade_maxima = df_corrida['speed_kmh'].max()
+        
+        # Frequência cardíaca
+        fc_media = df_corrida[df_corrida['heart_rate'].notna()]['heart_rate'].mean() if 'heart_rate' in df_corrida.columns else None
+        fc_maxima = df_corrida[df_corrida['heart_rate'].notna()]['heart_rate'].max() if 'heart_rate' in df_corrida.columns else None
+        
+        # Elevação
+        elevacao_min = df_corrida['elevation'].min()
+        elevacao_max = df_corrida['elevation'].max()
+        ganho_elevacao = elevacao_max - elevacao_min
+        
+        # Exibir métricas em colunas
+        col1, col2, col3, col4, col5 = st.columns(5)
+        
+        with col1:
+            st.metric("Distância Total", f"{distancia_total:.2f} km")
+        with col2:
+            st.metric("Tempo Total", f"{tempo_total:.1f} min")
+        with col3:
+            st.metric("Velocidade Média", f"{velocidade_media:.1f} km/h" if not np.isnan(velocidade_media) else "N/A")
+        with col4:
+            if fc_media:
+                st.metric("FC Média", f"{fc_media:.0f} bpm")
+            else:
+                st.metric("FC Média", "N/A")
+        with col5:
+            st.metric("Ganho Elevação", f"{ganho_elevacao:.1f} m")
+        
+        st.markdown("---")
+        
+        # Gráficos baseados nas imagens de referência
+        st.subheader("📊 Visualizações da Corrida")
+        
+        # Gráfico 1: Velocidade ao longo do tempo (inspirado na imagem 01)
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("Velocidade ao Longo do Tempo")
+            fig_speed = px.line(df_corrida, x='cumulative_time', y='speed_kmh',
+                               title='Velocidade (km/h) vs Tempo (min)',
+                               labels={'cumulative_time': 'Tempo (min)', 'speed_kmh': 'Velocidade (km/h)'})
+            fig_speed.update_traces(line_color='blue')
+            st.plotly_chart(fig_speed, use_container_width=True)
+        
+        with col2:
+            st.subheader("Frequência Cardíaca")
+            if 'heart_rate' in df_corrida.columns and df_corrida['heart_rate'].notna().any():
+                fig_hr = px.line(df_corrida, x='cumulative_time', y='heart_rate',
+                                title='Frequência Cardíaca (bpm) vs Tempo (min)',
+                                labels={'cumulative_time': 'Tempo (min)', 'heart_rate': 'FC (bpm)'})
+                fig_hr.update_traces(line_color='red')
+                st.plotly_chart(fig_hr, use_container_width=True)
+            else:
+                st.info("Dados de frequência cardíaca não disponíveis")
+        
+        # Gráfico 2: Perfil de elevação (inspirado na imagem 02)
+        st.subheader("Perfil de Elevação")
+        fig_elevation = px.area(df_corrida, x='cumulative_distance', y='elevation',
+                               title='Perfil de Elevação ao Longo da Corrida',
+                               labels={'cumulative_distance': 'Distância (km)', 'elevation': 'Elevação (m)'})
+        fig_elevation.update_traces(fill='tonexty', fillcolor='rgba(0,100,80,0.2)', line_color='green')
+        st.plotly_chart(fig_elevation, use_container_width=True)
+        
+        # Gráfico 3: Pace vs Distância (inspirado na imagem 03)
+        st.subheader("Ritmo ao Longo da Corrida")
+        # Calcular pace (min/km)
+        df_corrida['pace'] = np.where(df_corrida['speed_kmh'] > 0, 60 / df_corrida['speed_kmh'], 0)
+        df_corrida['pace'] = np.where(df_corrida['pace'] > 15, 15, df_corrida['pace'])  # Limitar valores extremos
+        
+        fig_pace = px.line(df_corrida, x='cumulative_distance', y='pace',
+                          title='Ritmo (min/km) vs Distância (km)',
+                          labels={'cumulative_distance': 'Distância (km)', 'pace': 'Ritmo (min/km)'})
+        fig_pace.update_traces(line_color='orange')
+        st.plotly_chart(fig_pace, use_container_width=True)
+        
+        # Gráfico 4: Cadência (inspirado na imagem 04)
+        if 'cadence' in df_corrida.columns and df_corrida['cadence'].notna().any():
+            st.subheader("Cadência ao Longo do Tempo")
+            fig_cadence = px.line(df_corrida, x='cumulative_time', y='cadence',
+                                 title='Cadência (passos/min) vs Tempo (min)',
+                                 labels={'cumulative_time': 'Tempo (min)', 'cadence': 'Cadência (spm)'})
+            fig_cadence.update_traces(line_color='purple')
+            st.plotly_chart(fig_cadence, use_container_width=True)
+        
+        # Mapa da rota
+        st.subheader("🗺️ Mapa da Rota")
+        
+        # Criar mapa
+        lat_centro = df_corrida['latitude'].mean()
+        lon_centro = df_corrida['longitude'].mean()
+        
+        m = folium.Map(location=[lat_centro, lon_centro], zoom_start=14)
+        
+        # Adicionar rota como linha
+        pontos_rota = list(zip(df_corrida['latitude'], df_corrida['longitude']))
+        
+        folium.PolyLine(
+            pontos_rota,
+            weight=4,
+            color='blue',
+            opacity=0.8,
+            popup='Rota da Corrida'
+        ).add_to(m)
+        
+        # Marcadores de início e fim
+        folium.Marker(
+            location=[df_corrida['latitude'].iloc[0], df_corrida['longitude'].iloc[0]],
+            popup='Início da Corrida',
+            icon=folium.Icon(color='green', icon='play')
+        ).add_to(m)
+        
+        folium.Marker(
+            location=[df_corrida['latitude'].iloc[-1], df_corrida['longitude'].iloc[-1]],
+            popup='Fim da Corrida',
+            icon=folium.Icon(color='red', icon='stop')
+        ).add_to(m)
+        
+        # Exibir mapa
+        st_folium(m, width=1000, height=600, returned_objects=[])
+        
+        # Análise estatística adicional
+        st.subheader("📋 Análise Estatística Detalhada")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**Resumo da Velocidade:**")
+            st.write(f"• Velocidade Média: {velocidade_media:.2f} km/h")
+            st.write(f"• Velocidade Máxima: {velocidade_maxima:.2f} km/h")
+            st.write(f"• Velocidade Mínima: {df_corrida[df_corrida['speed_kmh'] > 0]['speed_kmh'].min():.2f} km/h")
+            
+            if 'pace' in df_corrida.columns:
+                pace_medio = df_corrida[df_corrida['pace'] > 0]['pace'].mean()
+                st.write(f"• Ritmo Médio: {pace_medio:.2f} min/km")
+        
+        with col2:
+            if fc_media:
+                st.write("**Resumo da Frequência Cardíaca:**")
+                st.write(f"• FC Média: {fc_media:.0f} bpm")
+                st.write(f"• FC Máxima: {fc_maxima:.0f} bpm")
+                fc_minima = df_corrida[df_corrida['heart_rate'].notna()]['heart_rate'].min()
+                st.write(f"• FC Mínima: {fc_minima:.0f} bpm")
+            
+            st.write("**Resumo da Elevação:**")
+            st.write(f"• Elevação Mínima: {elevacao_min:.1f} m")
+            st.write(f"• Elevação Máxima: {elevacao_max:.1f} m")
+            st.write(f"• Ganho de Elevação: {ganho_elevacao:.1f} m")
+        
+        # Tabela com dados brutos (amostra)
+        if st.checkbox("Mostrar dados brutos (primeiros 100 pontos)"):
+            st.subheader("Dados do GPX (Amostra)")
+            colunas_mostrar = ['time', 'latitude', 'longitude', 'elevation', 'speed_kmh', 'cumulative_distance']
+            if 'heart_rate' in df_corrida.columns:
+                colunas_mostrar.append('heart_rate')
+            if 'cadence' in df_corrida.columns:
+                colunas_mostrar.append('cadence')
+            
+            st.dataframe(df_corrida[colunas_mostrar].head(100), use_container_width=True)
+    
+    else:
+        st.error("Não foi possível carregar os dados do arquivo GPX. Verifique se o arquivo existe e está no formato correto.")
+
 # ==============================================================================

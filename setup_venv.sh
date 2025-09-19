@@ -19,13 +19,13 @@ source venv/bin/activate
 echo "Atualizando pip..."
 pip install --upgrade pip
 
-# Instala as dependências necessárias
-echo "Instalando dependências..."
-#pip install pandas matplotlib seaborn jupyter numpy autopep8 pylint
-pip install pandas numpy autopep8 pylint folium streamlit_folium
+# Instala as dependências do requirements.txt
+echo "Instalando dependências do requirements.txt..."
+pip install -r requirements.txt
 
-# Cria arquivo de requisitos
-#pip freeze > requirements.txt
+# Instala ferramentas de desenvolvimento adicionais
+echo "Instalando ferramentas de desenvolvimento..."
+pip install autopep8 pylint
 
 echo "Ambiente virtual configurado com sucesso!"
 echo "Para ativar o ambiente, execute: source venv/bin/activate"
