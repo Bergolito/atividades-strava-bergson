@@ -63,6 +63,7 @@ Quarta,4,2025,5
 Quarta,4,2025,6
 Quarta,4,2025,7
 Quarta,4,2025,8
+Quarta,2,2025,9
 Quinta,5,2020,3
 Quinta,4,2020,4
 Quinta,3,2020,5
@@ -128,6 +129,7 @@ Quinta,5,2025,5
 Quinta,2,2025,6
 Quinta,1,2025,7
 Quinta,3,2025,8
+Quinta,4,2025,9
 Segunda,3,2020,3
 Segunda,3,2020,4
 Segunda,4,2020,5
@@ -180,6 +182,7 @@ Segunda,2,2025,5
 Segunda,4,2025,6
 Segunda,2,2025,7
 Segunda,1,2025,8
+Segunda,1,2025,9
 Sabado,2,2020,3
 Sabado,4,2020,4
 Sabado,1,2020,5
@@ -230,6 +233,7 @@ Sabado,2,2025,3
 Sabado,5,2025,5
 Sabado,1,2025,7
 Sabado,3,2025,8
+Sabado,1,2025,9
 Domingo,2,2020,3
 Domingo,1,2020,4
 Domingo,2,2020,5
@@ -275,6 +279,7 @@ Domingo,3,2025,5
 Domingo,2,2025,6
 Domingo,2,2025,7
 Domingo,6,2025,8
+Domingo,3,2025,9
 Terca,2,2020,3
 Terca,2,2020,4
 Terca,2,2020,5
@@ -340,6 +345,7 @@ Terca,1,2025,5
 Terca,1,2025,6
 Terca,6,2025,7
 Terca,4,2025,8
+Terca,4,2025,9
 Sexta,1,2020,3
 Sexta,1,2020,4
 Sexta,2,2020,5
@@ -399,3 +405,4 @@ Sexta,4,2025,5
 Sexta,3,2025,6
 Sexta,3,2025,7
 Sexta,4,2025,8
+Sexta,4,2025,9
