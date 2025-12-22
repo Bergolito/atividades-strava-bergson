@@ -56,11 +56,9 @@ def gera_sumario_atividades_por_ano(df, ano):
   
   for mes in range(1,13):
     df_filtrado = retorna_atividades_mes_ano(df, ano, mes)
-    print(f'ano {ano} | mes {mes} | {df_filtrado.shape[0]}')
     qtd = df_filtrado.shape[0]
     distancia = df_filtrado['Distance'].sum()
     calorias = df_filtrado['Calories'].sum()
-    print(f'qtd => {qtd} | distancia =>  {distancia} | calorias => {calorias}')
 
     df_sumario.loc[0,'ano'] = ano
     df_sumario.loc[0,'mes'] = mes
@@ -68,10 +66,7 @@ def gera_sumario_atividades_por_ano(df, ano):
     df_sumario.loc[0,'distancia'] = distancia
     df_sumario.loc[0,'calorias'] = calorias
 
-    print(f'df_sumario => {df_sumario.shape}')
     df_sumario_geral = pd.concat([df_sumario_geral, df_sumario], ignore_index=True)
-
-  print(f'df_sumario_geral => {df_sumario_geral.shape[0]}')
 
   return df_sumario_geral
 # =======================================================
@@ -88,7 +83,6 @@ def gera_sumarios_anos():
   ]
 
   for item in lista_dfs_ano:
-    print(f'item[0] => {item[0].shape[0]} | item[1] => {item[1]}')
     df_sumario_ano = gera_sumario_atividades_por_ano(item[0], item[1])
     df_sumario_ano.to_csv(f'datasets/gerais/sumario_atividades_{item[1]}.csv')
     print(f'\n\nSalvando arquivo datasets/gerais/sumario_atividades_{item[1]}.csv...')

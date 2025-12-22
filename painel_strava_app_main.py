@@ -5,9 +5,9 @@ import pandas as pd
 import streamlit as st
 import folium
 import gpxpy
-import plotly.graph_objects as go
+#import plotly.graph_objects as go
 import plotly.express as px
-from datetime import datetime
+#from datetime import datetime
 import numpy as np
 
 from streamlit_folium import st_folium
@@ -201,12 +201,12 @@ with nova_aba:
         # Gráfico de pizza para distribuição por tipo
         st.subheader("Distribuição de Atividades por Tipo")
         grafico_pizza = grafico_pizza_tipo_atv(df_filtro_pizza)
-        st.altair_chart(grafico_pizza, use_container_width=True)
+        st.altair_chart(grafico_pizza, width="use_container")
 
     with col5:
         st.subheader("Barras: Atividades Físicas por Ano")
         grafico_atividades_ano_mes = gera_grafico_barras_atividades_mes(df_filtro_barras, titulo_barras)
-        st.altair_chart(grafico_atividades_ano_mes, use_container_width=True)
+        st.altair_chart(grafico_atividades_ano_mes, width="use_container")
 
     # ====== Linha 3 ======
     col6, col7 = st.columns(2)
@@ -225,7 +225,7 @@ with nova_aba:
             titulo =f'Ranking de Atividades por tipo (2020 a 2025)'
             grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
 
-        st.altair_chart(grafico_ranking_01, use_container_width=True)
+        st.altair_chart(grafico_ranking_01, width="use_container")
 
     #- Ranking das atividades por Dia da Semana
     with col7:
@@ -241,7 +241,7 @@ with nova_aba:
             titulo =f'Ranking de Atividades por dia da semana entre {ano_inicio} e {ano_fim}'
             grafico_ranking_02 = gera_grafico_ranking_dia_semana_01(df_atvs_dia_semana_todos, titulo)
 
-        st.altair_chart(grafico_ranking_02, use_container_width=True)
+        st.altair_chart(grafico_ranking_02, width="use_container")
 
     # ====== Linha 4 ======
     col8, col9 = st.columns(2)
@@ -257,13 +257,13 @@ with nova_aba:
         st.subheader(f"Atividades Por Tipo em {ano_selecionado1}")
         titulo =f'Atividades Por Tipo em {ano_selecionado1}'
         grafico_barras_emp_01 = grafico_barras_empilhadas_por_tipo(titulo, df_filtro_tipo)    
-        st.altair_chart(grafico_barras_emp_01, use_container_width=True)
+        st.altair_chart(grafico_barras_emp_01, width="use_container")
 
     with col9:
         st.subheader(f"Atividades Por Dia da Semana em {ano_selecionado1}")
         titulo =f'Atividades Por Dia da Semana em {ano_selecionado1}'
         grafico_barras_emp_02 = grafico_barras_empilhadas_por_dia_semana(titulo, df_dia_semana)    
-        st.altair_chart(grafico_barras_emp_02, use_container_width=True)
+        st.altair_chart(grafico_barras_emp_02, width="use_container")
 
 
     # ====== Linha 4 ======
@@ -284,12 +284,12 @@ with nova_aba:
     with col10:
         st.subheader(f'Mapa de Calor por Tipo de Atividades em {ano_selecionado1}')
         grafico_mapa_calor_01 = gera_graficos_mapa_calor_por_tipo_atv(df_filtro_mapa_tipo, titulo_tipo)
-        st.altair_chart(grafico_mapa_calor_01, use_container_width=True)
+        st.altair_chart(grafico_mapa_calor_01, width="use_container")
 
     with col11:
         st.subheader(f'Mapa de Calor por Dia da Semana em {ano_selecionado1}')
         grafico_mapa_calor_02 = gera_graficos_mapa_calor_por_dia_semana_atv(df_filtro_mapa_dia_semana, titulo_dia_semana)
-        st.altair_chart(grafico_mapa_calor_02, use_container_width=True)
+        st.altair_chart(grafico_mapa_calor_02, width="use_container")
 # ==============================================================================
 with tab_detalhamento:
 
@@ -444,7 +444,7 @@ with tab_detalhamento:
             df_exibicao = df_exibicao.rename(columns=renomear)
             
             # Exibir a tabela usando o método dataframe do Streamlit
-            st.dataframe(df_exibicao, use_container_width=True)
+            st.dataframe(df_exibicao, width="use_container")
             
             # Área para exibir detalhes de uma atividade específica
             st.markdown('### Detalhes da Atividade')
@@ -681,13 +681,13 @@ with tab_corrida:
         col_img1, col_img2, col_img3, col_img4 = st.columns(4)
         
         with col_img1:
-            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", use_container_width=True)
+            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", width="use_container")
         with col_img2:
-            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", use_container_width=True)
+            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", width="use_container")
         with col_img3:
-            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", use_container_width=True)
+            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", width="use_container")
         with col_img4:
-            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", use_container_width=True)
+            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", width="use_container")
         
         st.markdown("---")
         
@@ -740,7 +740,7 @@ with tab_corrida:
                                title='Velocidade (km/h) vs Tempo (min)',
                                labels={'cumulative_time': 'Tempo (min)', 'speed_kmh': 'Velocidade (km/h)'})
             fig_speed.update_traces(line_color='blue')
-            st.plotly_chart(fig_speed, use_container_width=True)
+            st.plotly_chart(fig_speed, width="use_container")
         
         with col2:
             st.subheader("Frequência Cardíaca")
@@ -749,7 +749,7 @@ with tab_corrida:
                                 title='Frequência Cardíaca (bpm) vs Tempo (min)',
                                 labels={'cumulative_time': 'Tempo (min)', 'heart_rate': 'FC (bpm)'})
                 fig_hr.update_traces(line_color='red')
-                st.plotly_chart(fig_hr, use_container_width=True)
+                st.plotly_chart(fig_hr, width="use_container")
             else:
                 st.info("Dados de frequência cardíaca não disponíveis")
         
@@ -759,7 +759,7 @@ with tab_corrida:
                                title='Perfil de Elevação ao Longo da Corrida',
                                labels={'cumulative_distance': 'Distância (km)', 'elevation': 'Elevação (m)'})
         fig_elevation.update_traces(fill='tonexty', fillcolor='rgba(0,100,80,0.2)', line_color='green')
-        st.plotly_chart(fig_elevation, use_container_width=True)
+        st.plotly_chart(fig_elevation, width="use_container")
         
         # Gráfico 3: Pace vs Distância (inspirado na imagem 03)
         st.subheader("Ritmo ao Longo da Corrida")
@@ -771,7 +771,7 @@ with tab_corrida:
                           title='Ritmo (min/km) vs Distância (km)',
                           labels={'cumulative_distance': 'Distância (km)', 'pace': 'Ritmo (min/km)'})
         fig_pace.update_traces(line_color='orange')
-        st.plotly_chart(fig_pace, use_container_width=True)
+        st.plotly_chart(fig_pace, width="use_container")
         
         # Gráfico 4: Cadência (inspirado na imagem 04)
         if 'cadence' in df_corrida.columns and df_corrida['cadence'].notna().any():
@@ -780,7 +780,7 @@ with tab_corrida:
                                  title='Cadência (passos/min) vs Tempo (min)',
                                  labels={'cumulative_time': 'Tempo (min)', 'cadence': 'Cadência (spm)'})
             fig_cadence.update_traces(line_color='purple')
-            st.plotly_chart(fig_cadence, use_container_width=True)
+            st.plotly_chart(fig_cadence, width="use_container")
         
         # Mapa da rota
         st.subheader("🗺️ Mapa da Rota")
@@ -855,7 +855,7 @@ with tab_corrida:
             if 'cadence' in df_corrida.columns:
                 colunas_mostrar.append('cadence')
             
-            st.dataframe(df_corrida[colunas_mostrar].head(100), use_container_width=True)
+            st.dataframe(df_corrida[colunas_mostrar].head(100), width="use_container")
     
     else:
         st.error("Não foi possível carregar os dados do arquivo GPX. Verifique se o arquivo existe e está no formato correto.")

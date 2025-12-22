@@ -7,6 +7,7 @@ import os
 
 from datetime import datetime
 from painel_strava_funcoes import *
+from tcx2gpx.tcx2gpx import TCX2GPX
 
 # ==================================
 # Funções
@@ -14,7 +15,7 @@ from painel_strava_funcoes import *
 
 # ==================================
 def salvar_arquivos_atividades_completos_anos():
-  df_atividades_todos = pd.read_csv('datasets/atividades.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_todos = pd.read_csv('datasets/atividades.csv', sep=',', encoding="UTF-8")
 
   df2 = df_atividades_todos.copy()
   df2['data_ano'] = df_atividades_todos['Activity Date'].apply(retorna_ano_data)
@@ -175,14 +176,10 @@ def convert_tcx_to_gpx(file_to_convert):
     """
     Converte um arquivo TCX para GPX.
     """
-    # Importa a biblioteca tcx2gpx
-    from tcx2gpx.tcx2gpx import TCX2GPX
 
     # Cria um objeto TCX2GPX e converte o arquivo
     gps_object = TCX2GPX(tcx_path=file_to_convert)
     gps_object.convert()
-
-    from tcx2gpx.tcx2gpx import TCX2GPX
 
     gps_object = TCX2GPX(tcx_path=file_to_convert)
     gps_object.convert()
@@ -206,9 +203,18 @@ def executa_preprocessamento_dados():
   salvar_arquivos_somatorios_anos()
 # ==================================
 
+def gera_pastas_datasets():
+   
+  # criar as pastas gerais e predados dentro de datasets, se não existirem
+  if not os.path.exists('datasets/gerais'):
+      os.makedirs('datasets/gerais')
+  if not os.path.exists('datasets/predados'):
+      os.makedirs('datasets/predados')
+
 # ==================================
 if __name__ == "__main__":
   # Executa o código
   compactar_pasta("datasets", "bkp_datasets")
+  gera_pastas_datasets()
   executa_preprocessamento_dados()
 # ==================================  

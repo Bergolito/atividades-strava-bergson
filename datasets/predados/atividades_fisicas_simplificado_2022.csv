@@ -17,7 +17,7 @@
 15,453,6565959926,"Jan 22, 2022, 10:06:49 PM",Corrida na UFPE,Run,,2411,5.53,192.0,activities/6981877930.gpx.gz,2.948,2.742,553.0,,,,,,2022,1,Sabado,40.18333333333333
 16,454,6571693822,"Jan 23, 2022, 8:09:32 PM",Caminhada acompanhando Davi no patinete,Walk,,2744,4.1,184.0,activities/6988055665.gpx.gz,3.503,1.497,378.0,,,,,,2022,1,Domingo,45.73333333333333
 17,455,6637401374,"Feb 5, 2022, 9:45:33 PM",Caminhada noturna na UFPE,Walk,,2948,4.81,,activities/6637401374.gpx,5.74,1.633,444.0,,,,,,2022,2,Sabado,49.13333333333333
-18,456,6641015381,"Feb 6, 2022, 2:21:07 PM",Caminhada de ReposiÃÂ§ÃÂ£o de Vitamina D,Walk,,3113,4.06,132.0,activities/7062192474.gpx.gz,2.781,1.317,374.0,,,,,,2022,2,Domingo,51.88333333333333
+18,456,6641015381,"Feb 6, 2022, 2:21:07 PM",Caminhada de ReposiÃ§Ã£o de Vitamina D,Walk,,3113,4.06,132.0,activities/7062192474.gpx.gz,2.781,1.317,374.0,,,,,,2022,2,Domingo,51.88333333333333
 19,457,6657755142,"Feb 9, 2022, 7:09:11 PM",Caminhada na UFPE,Walk,,2971,4.8,,activities/6657755142.gpx,4.2,1.618,443.0,,,,,,2022,2,Quarta,49.516666666666666
 20,458,6668475559,"Feb 11, 2022, 10:38:31 PM",Caminhada de aquecimento,Walk,,819,1.22,168.0,activities/7091608334.gpx.gz,1.973,1.499,113.0,,,,,,2022,2,Sexta,13.65
 21,459,6668475769,"Feb 11, 2022, 10:52:31 PM",Corrida na UFPE,Run,,2042,4.37,185.0,activities/7091608522.gpx.gz,2.722,2.475,428.0,,,,,,2022,2,Sexta,34.03333333333333
@@ -53,7 +53,7 @@
 51,489,6951491237,"Apr 8, 2022, 10:15:19 PM",Treino academia,Weight Training,,3433,0.0,145.0,activities/7397366634.gpx.gz,0.0,0.0,,,,,,,2022,4,Sexta,57.21666666666667
 52,490,6977816851,"Apr 13, 2022, 9:56:31 PM",Treino academia,Weight Training,,3585,0.0,175.0,activities/7425886876.gpx.gz,0.0,0.0,,,,,,,2022,4,Quarta,59.75
 53,491,6982921483,"Apr 14, 2022, 10:16:20 PM",Caminhada de aquecimento,Walk,,864,1.32,141.0,activities/7431415263.gpx.gz,2.001,1.533,122.0,,,,,,2022,4,Quinta,14.4
-54,492,6982921889,"Apr 14, 2022, 10:31:09 PM",Corrida na praÃÂ§a do Engenho do Meio,Run,,2452,5.42,188.0,activities/7431415656.gpx.gz,3.213,2.689,529.0,,,,,,2022,4,Quinta,40.86666666666667
+54,492,6982921889,"Apr 14, 2022, 10:31:09 PM",Corrida na praÃ§a do Engenho do Meio,Run,,2452,5.42,188.0,activities/7431415656.gpx.gz,3.213,2.689,529.0,,,,,,2022,4,Quinta,40.86666666666667
 55,493,6993572253,"Apr 16, 2022, 7:26:43 PM",Caminhada acompanhando Davi no patinete,Walk,,3716,5.5,182.0,activities/7442989581.gpx.gz,7.643,1.908,507.0,,,,,,2022,4,Sabado,61.93333333333333
 56,494,7009629461,"Apr 19, 2022, 10:11:21 PM",Treino academia,Weight Training,,3355,0.0,153.0,activities/7460491940.gpx.gz,0.0,0.0,,,,,,,2022,4,Terca,55.91666666666666
 57,495,7015206061,"Apr 20, 2022, 10:49:07 PM",Treino academia,Weight Training,,4085,0.0,180.0,activities/7466494640.gpx.gz,0.0,0.0,,,,,,,2022,4,Quarta,68.08333333333333
@@ -78,11 +78,11 @@
 76,514,7315579619,"Jun 15, 2022, 10:36:45 PM",Caminhada ao anoitecer,Hike,,1204,1.83,,activities/7315579619.gpx,2.648,1.571,169.0,,,,,,2022,6,Quarta,20.066666666666663
 77,515,7315687305,"Jun 15, 2022, 10:57:17 PM",Corrida ao anoitecer,Run,,2032,4.93,,activities/7315687305.gpx,3.312,2.493,455.0,,,,,,2022,6,Quarta,33.86666666666667
 78,516,7421653821,"Jul 5, 2022, 9:44:42 PM",Corrida ao anoitecer,Run,,2110,4.82,,activities/7421653821.gpx,4.548,2.352,445.0,,,,,,2022,7,Terca,35.166666666666664
-79,517,7446836869,"Jul 10, 2022, 2:52:57 PM",Corrida da hora do almoÃÂ§o,Hike,,3093,5.02,,activities/7446836869.gpx,4.92,1.635,463.0,,,,,,2022,7,Domingo,51.55
+79,517,7446836869,"Jul 10, 2022, 2:52:57 PM",Corrida da hora do almoÃ§o,Hike,,3093,5.02,,activities/7446836869.gpx,4.92,1.635,463.0,,,,,,2022,7,Domingo,51.55
 80,518,7507285092,"Jul 21, 2022, 10:01:34 PM",Caminhada ao anoitecer,Hike,,3064,4.65,,activities/7507285092.gpx,6.868,1.52,429.0,,,,,,2022,7,Quinta,51.06666666666667
 81,519,7545520215,"Jul 28, 2022, 10:36:44 PM",Caminhada ao anoitecer,Hike,,1857,3.01,,activities/7545520215.gpx,4.978,1.68,278.0,,,,,,2022,7,Quinta,30.95
 82,520,7545629791,"Jul 28, 2022, 11:08:02 PM",Corrida ao anoitecer,Run,,2053,4.73,,activities/7545629791.gpx,3.568,2.391,436.0,,,,,,2022,7,Quinta,34.21666666666667
-83,521,7560056397,"Jul 31, 2022, 3:17:22 PM",Caminhada da hora do almoÃÂ§o,Hike,,2896,4.64,,activities/7560056397.gpx,9.642,1.626,428.0,,,,,,2022,7,Domingo,48.266666666666666
+83,521,7560056397,"Jul 31, 2022, 3:17:22 PM",Caminhada da hora do almoÃ§o,Hike,,2896,4.64,,activities/7560056397.gpx,9.642,1.626,428.0,,,,,,2022,7,Domingo,48.266666666666666
 84,522,7599354041,"Aug 7, 2022, 4:22:28 PM",Caminhada vespertina,Hike,,2870,4.77,,activities/7599354041.gpx,4.156,1.72,440.0,,,,,,2022,8,Domingo,47.833333333333336
 85,523,7611734753,"Aug 9, 2022, 10:06:45 PM",Caminhada ao anoitecer,Hike,,3639,5.61,,activities/7611734753.gpx,4.9,1.542,517.0,,,,,,2022,8,Terca,60.65
 86,524,7622748892,"Aug 11, 2022, 9:09:03 PM",Caminhada ao anoitecer,Hike,,2882,4.43,,activities/7622748892.gpx,6.078,1.54,409.0,,,,,,2022,8,Quinta,48.03333333333333
@@ -91,12 +91,12 @@
 89,527,7655836067,"Aug 16, 2022, 10:52:52 AM",Caminhada matinal na UFPE,Walk,,1261,2.01,,activities/8169152211.gpx.gz,5.5,1.595,185.0,,,,,,2022,8,Terca,21.016666666666666
 90,528,7655843229,"Aug 16, 2022, 11:14:27 AM",Corrida matinal na UFPE,Run,,915,2.3,,activities/8169160254.gpx.gz,6.59,2.531,213.0,,,,,,2022,8,Terca,15.25
 91,529,7656226551,"Aug 17, 2022, 10:04:33 PM",Treino Funcional,Workout,,4396,0.0,151.0,activities/8169582715.gpx.gz,0.0,0.0,,,,,,,2022,8,Quarta,73.26666666666667
-92,530,7656226679,"Aug 17, 2022, 11:18:37 PM",Treino elÃÂ­ptico academia,Elliptical,,542,0.0,165.0,activities/8169582799.gpx.gz,0.0,0.0,0.0,,,,,,2022,8,Quarta,9.033333333333331
+92,530,7656226679,"Aug 17, 2022, 11:18:37 PM",Treino elÃ­ptico academia,Elliptical,,542,0.0,165.0,activities/8169582799.gpx.gz,0.0,0.0,0.0,,,,,,2022,8,Quarta,9.033333333333331
 93,531,7664589766,"Aug 18, 2022, 8:50:40 PM",Aquecimento antes da caminhada,Walk,,389,0.54,147.0,activities/8178948956.gpx.gz,4.88,1.39,50.0,,,,,,2022,8,Quinta,6.483333333333333
 94,532,7664590157,"Aug 18, 2022, 8:57:38 PM",Caminhada na UFPE,Walk,,4323,4.7,177.0,activities/8178949214.gpx.gz,2.648,1.425,433.0,,,,,,2022,8,Quinta,72.05
 95,533,7664590305,"Aug 18, 2022, 9:59:20 PM",Corrida na UFPE,Run,,1707,4.19,187.0,activities/8178949448.gpx.gz,3.936,2.515,387.0,,,,,,2022,8,Quinta,28.45
 96,534,7681653654,"Aug 19, 2022, 10:32:45 PM",Treino academia,Workout,,3634,0.0,157.0,activities/8198312431.gpx.gz,0.0,0.0,,,,,,,2022,8,Sexta,60.56666666666667
-97,535,7681653999,"Aug 21, 2022, 6:49:38 PM",NataÃÂ§ÃÂ£o,Swim,,1354,0.0,57.0,activities/8198312706.gpx.gz,0.0,0.0,,,,,,,2022,8,Domingo,22.566666666666663
+97,535,7681653999,"Aug 21, 2022, 6:49:38 PM",NataÃ§Ã£o,Swim,,1354,0.0,57.0,activities/8198312706.gpx.gz,0.0,0.0,,,,,,,2022,8,Domingo,22.566666666666663
 98,536,7697546694,"Aug 24, 2022, 10:02:47 PM",Treino Funcional,Workout,,5143,0.0,169.0,activities/8216060141.gpx.gz,0.0,0.0,,,,,,,2022,8,Quarta,85.71666666666667
 99,537,7703964823,"Aug 25, 2022, 10:18:35 PM",Caminhada na UFPE,Walk,,3308,4.23,134.0,activities/8223488027.gpx.gz,10.549,1.405,390.0,,,,,,2022,8,Quinta,55.13333333333333
 100,538,7728015540,"Aug 26, 2022, 9:35:06 PM",Treino Funcional,Workout,,2778,0.0,174.0,activities/8250610593.gpx.gz,0.0,0.0,,,,,,,2022,8,Sexta,46.3
@@ -143,8 +143,8 @@
 141,579,8016480889,"Oct 24, 2022, 10:53:36 PM",Corrida na UFPE,Run,,2113,5.27,176.0,activities/8577200518.tcx.gz,4.195,2.782,320.0,,,,,,2022,10,Segunda,35.21666666666667
 142,580,8027993004,"Oct 26, 2022, 9:55:33 PM",Afternoon Workout,Workout,,4239,0.0,171.0,activities/8590176283.tcx.gz,0.0,0.0,485.0,,,,,,2022,10,Quarta,70.65
 143,581,8059423748,"Oct 27, 2022, 10:14:13 PM",Caminhada de aquecimento,Walk,,2843,3.13,146.0,activities/8625953778.tcx.gz,2.594,1.534,294.0,,,,,,2022,10,Quinta,47.38333333333333
-144,582,8059424268,"Oct 27, 2022, 10:50:06 PM",Corrida rÃÂ¡pida,Run,,1611,2.03,180.0,activities/8625954537.tcx.gz,4.159,2.873,142.0,,,,,,2022,10,Quinta,26.85
-145,583,8059424627,"Oct 27, 2022, 11:04:40 PM",Caminhada rÃÂ¡pida,Walk,,1432,1.76,176.0,activities/8625954927.tcx.gz,5.373,1.501,181.0,,,,,,2022,10,Quinta,23.866666666666667
+144,582,8059424268,"Oct 27, 2022, 10:50:06 PM",Corrida rÃ¡pida,Run,,1611,2.03,180.0,activities/8625954537.tcx.gz,4.159,2.873,142.0,,,,,,2022,10,Quinta,26.85
+145,583,8059424627,"Oct 27, 2022, 11:04:40 PM",Caminhada rÃ¡pida,Walk,,1432,1.76,176.0,activities/8625954927.tcx.gz,5.373,1.501,181.0,,,,,,2022,10,Quinta,23.866666666666667
 146,584,8059425411,"Oct 29, 2022, 2:32:44 PM",Caminhada vitamida D,Walk,,3637,3.31,141.0,activities/8625955659.tcx.gz,5.935,0.911,320.0,,,,,,2022,10,Sabado,60.61666666666667
 147,585,8059425743,"Nov 1, 2022, 10:39:39 PM",Caminhada de aquecimento,Walk,,2095,2.03,131.0,activities/8625956100.tcx.gz,4.395,0.969,189.0,,,,,,2022,11,Terca,34.916666666666664
 148,586,8059426271,"Nov 1, 2022, 11:02:10 PM",Corrida na UFPE,Run,,3710,5.46,175.0,activities/8625956710.tcx.gz,4.201,2.865,400.0,,,,,,2022,11,Terca,61.833333333333336
@@ -194,5 +194,5 @@
 192,630,8293115770,"Dec 24, 2022, 7:01:36 PM",Futebol na UFPE com Davi,Football (Soccer),,5122,0.0,184.0,activities/8890189542.tcx.gz,0.0,0.0,724.0,,,,,,2022,12,Sabado,85.36666666666666
 193,631,8297549136,"Dec 26, 2022, 9:54:15 PM",Treino Funcional,Workout,,4310,0.0,150.0,activities/8895231337.tcx.gz,0.0,0.0,549.0,,,,,,2022,12,Segunda,71.83333333333333
 194,632,8300242215,"Dec 27, 2022, 10:03:19 PM",Caminhada de aquecimento,Walk,,647,1.12,130.0,activities/8898279144.tcx.gz,7.175,1.737,83.0,,,,,,2022,12,Terca,10.783333333333331
-195,633,8300242341,"Dec 27, 2022, 10:14:18 PM",Corrida na UFPE (ÃÂltima de 2022),Run,,3325,7.23,186.0,activities/8898279201.tcx.gz,5.167,2.56,680.0,,,,,,2022,12,Terca,55.41666666666666
+195,633,8300242341,"Dec 27, 2022, 10:14:18 PM",Corrida na UFPE (Ãltima de 2022),Run,,3325,7.23,186.0,activities/8898279201.tcx.gz,5.167,2.56,680.0,,,,,,2022,12,Terca,55.41666666666666
 196,635,8332731506,"Dec 28, 2022, 6:56:46 PM",Treino Funcional,Workout,,2817,0.0,137.0,activities/8935452912.tcx.gz,0.0,0.0,324.0,,,,,,2022,12,Quarta,46.95

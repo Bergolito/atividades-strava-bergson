@@ -1,7 +1,9 @@
-import xml.etree.ElementTree as ET
 import os
-import pandas as pd
 import datetime
+import re
+import pandas as pd
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
 class TCXParser:
     """
@@ -84,8 +86,6 @@ def recupera_coordenadas_arquivos_tcx():
     de latitude e longitude e gera um arquivo CSV para cada arquivo TCX na pasta
     datasets/mapas.
     """
-    import os
-    import pandas as pd
     
     # Criar diretório de saída se não existir
     output_dir = "datasets/mapas"
@@ -172,14 +172,21 @@ def processar_arquivo_tcx_para_csv(input_dir, output_dir):
     Returns:
         int: Número de arquivos processados com sucesso
     """
-    import os
-    import pandas as pd
-    import xml.etree.ElementTree as ET
-    from pathlib import Path
-    import re
     
     # Criar diretório de saída se não existir
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    
+    # Criar diretório processamento se não existir
+    Path("processamento").mkdir(parents=True, exist_ok=True)
+    
+    # Abrir arquivo de log para problemas (modo append para preservar conteúdo existente)
+    log_path = "processamento/problemas_tcx.txt"
+    with open(log_path, 'a', encoding='utf-8') as log_file:
+        log_file.write(f"Nenhum ponto com coordenadas encontrado no arquivo:\n")
+        log_file.write(f"\n{'='*80}\n")
+        log_file.write(f"Log de Problemas - TCX Processing\n")
+        log_file.write(f"Data: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        log_file.write("="*80 + "\n\n")
     
     # Namespace padrão usado nos arquivos TCX da Garmin/Strava
     NAMESPACES = {
@@ -333,7 +340,10 @@ def processar_arquivo_tcx_para_csv(input_dir, output_dir):
             
             # Verificar se existem trackpoints
             if not trackpoints_data:
-                print(f"Nenhum ponto com coordenadas encontrado no arquivo {tcx_file}")
+                msg = f"Nenhum ponto com coordenadas encontrado no arquivo {tcx_file}\n"
+                #print(msg)
+                log_file.write(f"{tcx_file}\n")
+
                 count_errors += 1
                 continue
             
@@ -367,13 +377,24 @@ def processar_arquivo_tcx_para_csv(input_dir, output_dir):
             print(f"  - {len(trackpoints_data)} pontos de coordenadas extraídos")
             
         except Exception as e:
-            print(f"Erro ao processar o arquivo {tcx_file}: {str(e)}")
+            error_msg = f"Erro ao processar o arquivo {tcx_file}: {str(e)}"
+            print(error_msg)
+            
+            # Registrar o erro no arquivo de log
+            with open(log_path, 'a', encoding='utf-8') as log_file:
+                log_file.write(f"Arquivo: {tcx_file}\n")
+                log_file.write(f"Erro: {error_msg}\n\n")            
             count_errors += 1
     
     print(f"\nProcessamento concluído!")
     print(f"Total de arquivos: {len(arquivos_tcx)}")
     print(f"Processados com sucesso: {count_success}")
     print(f"Erros: {count_errors}")
+    
+    if count_errors > 0:
+        print(f"\nArquivos com problemas foram registrados em: {log_path}")
+    
+    log_file.close()
     
     return count_success
 

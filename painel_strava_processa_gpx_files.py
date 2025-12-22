@@ -1,22 +1,20 @@
 # =======================================================
 # Imports
 # =======================================================
-import pandas as pd
-import zipfile
+#import pandas as pd
 import os
 
 from datetime import datetime
 from painel_strava_funcoes import *
+from tcx2gpx.tcx2gpx import TCX2GPX
 
 # ==================================
 # Funções
 # ==================================
+"""
+Converte um arquivo TCX para GPX.
+"""
 def convert_tcx_to_gpx(file_to_convert):
-    """
-    Converte um arquivo TCX para GPX.
-    """
-    # Importa a biblioteca tcx2gpx
-    from tcx2gpx.tcx2gpx import TCX2GPX
 
     # Cria um objeto TCX2GPX e converte o arquivo
     gps_object = TCX2GPX(tcx_path=file_to_convert)

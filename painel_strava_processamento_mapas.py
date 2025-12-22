@@ -14,7 +14,7 @@ from painel_strava_funcoes import *
 
 # ==================================
 def salvar_arquivos_atividades_completos_anos():
-  df_atividades_todos = pd.read_csv('datasets/atividades.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_todos = pd.read_csv('datasets/atividades.csv', sep=',', encoding="UTF-8")
 
   df2 = df_atividades_todos.copy()
   df2['data_ano'] = df_atividades_todos['Activity Date'].apply(retorna_ano_data)
