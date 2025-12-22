@@ -746,7 +746,7 @@ with tab_corrida:
                                title='Velocidade (km/h) vs Tempo (min)',
                                labels={'cumulative_time': 'Tempo (min)', 'speed_kmh': 'Velocidade (km/h)'})
             fig_speed.update_traces(line_color='blue')
-            st.plotly_chart(fig_speed, width="use_container")
+            st.plotly_chart(fig_speed, use_container_width=True)
         
         with col2:
             st.subheader("Frequência Cardíaca")
@@ -755,7 +755,7 @@ with tab_corrida:
                                 title='Frequência Cardíaca (bpm) vs Tempo (min)',
                                 labels={'cumulative_time': 'Tempo (min)', 'heart_rate': 'FC (bpm)'})
                 fig_hr.update_traces(line_color='red')
-                st.plotly_chart(fig_hr, width="use_container")
+                st.plotly_chart(fig_hr, use_container_width=True)
             else:
                 st.info("Dados de frequência cardíaca não disponíveis")
         
@@ -765,7 +765,7 @@ with tab_corrida:
                                title='Perfil de Elevação ao Longo da Corrida',
                                labels={'cumulative_distance': 'Distância (km)', 'elevation': 'Elevação (m)'})
         fig_elevation.update_traces(fill='tonexty', fillcolor='rgba(0,100,80,0.2)', line_color='green')
-        st.plotly_chart(fig_elevation, width="use_container")
+        st.plotly_chart(fig_elevation, use_container_width=True)
         
         # Gráfico 3: Pace vs Distância (inspirado na imagem 03)
         st.subheader("Ritmo ao Longo da Corrida")
@@ -777,7 +777,7 @@ with tab_corrida:
                           title='Ritmo (min/km) vs Distância (km)',
                           labels={'cumulative_distance': 'Distância (km)', 'pace': 'Ritmo (min/km)'})
         fig_pace.update_traces(line_color='orange')
-        st.plotly_chart(fig_pace, width="use_container")
+        st.plotly_chart(fig_pace, use_container_width=True)
         
         # Gráfico 4: Cadência (inspirado na imagem 04)
         if 'cadence' in df_corrida.columns and df_corrida['cadence'].notna().any():
@@ -786,7 +786,7 @@ with tab_corrida:
                                  title='Cadência (passos/min) vs Tempo (min)',
                                  labels={'cumulative_time': 'Tempo (min)', 'cadence': 'Cadência (spm)'})
             fig_cadence.update_traces(line_color='purple')
-            st.plotly_chart(fig_cadence, width="use_container")
+            st.plotly_chart(fig_cadence, use_container_width=True)
         
         # Mapa da rota
         st.subheader("🗺️ Mapa da Rota")
