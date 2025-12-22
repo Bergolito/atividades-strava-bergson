@@ -5,9 +5,7 @@ import pandas as pd
 import streamlit as st
 import folium
 import gpxpy
-#import plotly.graph_objects as go
 import plotly.express as px
-#from datetime import datetime
 import numpy as np
 
 from streamlit_folium import st_folium
@@ -167,12 +165,15 @@ with nova_aba:
         #- Gauge: Distância em Km das Atividades
         #- Gauge: Qtd de Calorias Gastas das Atividades
         #- Gauge: Tempo em min das Atividades
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4, col5, col51 = st.columns(6)
         with col1:
             st.metric("Qtd Total de Atividades", df_selecionado.shape[0], "")
 
         with col2:
-            st.metric("Média Mensal", round(df_selecionado.shape[0]/12,1), "")
+            if ano_selecionado1 != 'Todos':
+                st.metric("Média Mensal", round(df_selecionado.shape[0]/12,1), "")
+            elif ano_selecionado1 == 'Todos':
+                st.metric("Média Anual", round(df_selecionado.shape[0]/len(opcoes_anos),1), "")
 
         with col3:		
             st.metric("Distância em Km", round(df_selecionado["Distance"].sum(), 1), "")
@@ -182,6 +183,9 @@ with nova_aba:
 
         with col5:
             st.metric("Tempo em min", round(df_selecionado["tempo_min"].sum(), 1), "")
+
+        with col51:
+            st.metric("Tempo em horas", round(df_selecionado["tempo_min"].sum()/60, 1), "")
             
     st.markdown("---")
 
