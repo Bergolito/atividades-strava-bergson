@@ -15,6 +15,7 @@ df_atividades_completo_2022 = pd.read_csv('datasets/predados/atividades_fisicas_
 df_atividades_completo_2023 = pd.read_csv('datasets/predados/atividades_fisicas_2023.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_completo_2024 = pd.read_csv('datasets/predados/atividades_fisicas_2024.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_completo_2025 = pd.read_csv('datasets/predados/atividades_fisicas_2025.csv', sep=',', encoding="ISO-8859-1")
+df_atividades_completo_2026 = pd.read_csv('datasets/predados/atividades_fisicas_2026.csv', sep=',', encoding="ISO-8859-1")
 
 df_atividades_simplificado_todos = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_todos.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_simplificado_2020 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2020.csv', sep=',', encoding="ISO-8859-1")
@@ -23,6 +24,7 @@ df_atividades_simplificado_2022 = pd.read_csv('datasets/predados/atividades_fisi
 df_atividades_simplificado_2023 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2023.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_simplificado_2024 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="UTF-8")
 df_atividades_simplificado_2025 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
+df_atividades_simplificado_2026 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2026.csv', sep=',', encoding="ISO-8859-1")
 
 # =======================================================
 # Funções
@@ -80,6 +82,7 @@ def gera_sumarios_anos():
       (df_atividades_simplificado_2023, 2023),
       (df_atividades_simplificado_2024, 2024),
       (df_atividades_simplificado_2025, 2025),
+      (df_atividades_simplificado_2026, 2026)
   ]
 
   for item in lista_dfs_ano:
@@ -90,11 +93,6 @@ def gera_sumarios_anos():
 # =======================================================
 # main 
 # =======================================================
-
-
-
-# ==================================
 if __name__ == "__main__":
   # Executa o código
   gera_dados_gerais()
-# ==================================  

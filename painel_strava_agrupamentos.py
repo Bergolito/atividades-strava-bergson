@@ -14,6 +14,7 @@ df_atividades_completo_2022 = pd.read_csv('datasets/predados/atividades_fisicas_
 df_atividades_completo_2023 = pd.read_csv('datasets/predados/atividades_fisicas_2023.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_completo_2024 = pd.read_csv('datasets/predados/atividades_fisicas_2024.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_completo_2025 = pd.read_csv('datasets/predados/atividades_fisicas_2025.csv', sep=',', encoding="ISO-8859-1")
+df_atividades_completo_2026 = pd.read_csv('datasets/predados/atividades_fisicas_2026.csv', sep=',', encoding="ISO-8859-1")
 
 df_atividades_simplificado_todos = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_todos.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_simplificado_2020 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2020.csv', sep=',', encoding="ISO-8859-1")
@@ -22,6 +23,7 @@ df_atividades_simplificado_2022 = pd.read_csv('datasets/predados/atividades_fisi
 df_atividades_simplificado_2023 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2023.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_simplificado_2024 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="UTF-8")
 df_atividades_simplificado_2025 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
+df_atividades_simplificado_2026 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2026.csv', sep=',', encoding="ISO-8859-1")
 
 # =======================================================
 # Funções
@@ -72,11 +74,12 @@ def processa_atividades_geral_tipo_ano():
     contagem_por_tipo_2023 = agrupamento_atividade_por_tipo_por_ano(df_atividades_simplificado_2023, 2023)
     contagem_por_tipo_2024 = agrupamento_atividade_por_tipo_por_ano(df_atividades_simplificado_2024, 2024)
     contagem_por_tipo_2025 = agrupamento_atividade_por_tipo_por_ano(df_atividades_simplificado_2025, 2025)
+    contagem_por_tipo_2026 = agrupamento_atividade_por_tipo_por_ano(df_atividades_simplificado_2026, 2026)
     
     atvs_por_tipo_concatenados = pd.concat(
     [
         contagem_por_tipo_2020, contagem_por_tipo_2021, contagem_por_tipo_2022, 
-        contagem_por_tipo_2023, contagem_por_tipo_2024, contagem_por_tipo_2025
+        contagem_por_tipo_2023, contagem_por_tipo_2024, contagem_por_tipo_2025, contagem_por_tipo_2026
     
     ], axis=0)
     
@@ -105,6 +108,7 @@ def processa_atividades_geral_tipo_ano_mes():
        (df_atividades_simplificado_2023, 2023),
        (df_atividades_simplificado_2024, 2024),
        (df_atividades_simplificado_2025, 2025),
+       (df_atividades_simplificado_2026, 2026)
     ]
 
     lista_de_dfs = []
@@ -142,11 +146,12 @@ def processa_atividades_geral_dia_semana_ano():
     contagem_por_tipo_2023 = agrupamento_atividade_por_diasemana_por_ano(df_atividades_simplificado_2023, 2023)
     contagem_por_tipo_2024 = agrupamento_atividade_por_diasemana_por_ano(df_atividades_simplificado_2024, 2024)
     contagem_por_tipo_2025 = agrupamento_atividade_por_diasemana_por_ano(df_atividades_simplificado_2025, 2025)
+    contagem_por_tipo_2026 = agrupamento_atividade_por_diasemana_por_ano(df_atividades_simplificado_2026, 2026)
     
     atvs_por_tipo_concatenados = pd.concat(
     [
         contagem_por_tipo_2020, contagem_por_tipo_2021, contagem_por_tipo_2022, 
-        contagem_por_tipo_2023, contagem_por_tipo_2024, contagem_por_tipo_2025
+        contagem_por_tipo_2023, contagem_por_tipo_2024, contagem_por_tipo_2025, contagem_por_tipo_2026
     
     ], axis=0)
     
@@ -169,12 +174,13 @@ def processa_atividades_geral_dia_semana_ano():
 def processa_atividades_geral_dia_semana_ano_mes():
 
     lista_dfs_ano = [
-       (df_atividades_simplificado_2020, 2020),
-       (df_atividades_simplificado_2021, 2021),
-       (df_atividades_simplificado_2022, 2022),
-       (df_atividades_simplificado_2023, 2023),
-       (df_atividades_simplificado_2024, 2024),
-       (df_atividades_simplificado_2025, 2025),
+      (df_atividades_simplificado_2020, 2020),
+      (df_atividades_simplificado_2021, 2021),
+      (df_atividades_simplificado_2022, 2022),
+      (df_atividades_simplificado_2023, 2023),
+      (df_atividades_simplificado_2024, 2024),
+      (df_atividades_simplificado_2025, 2025),
+      (df_atividades_simplificado_2026, 2026)
     ]
 
     lista_de_dfs = []

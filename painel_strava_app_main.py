@@ -35,6 +35,7 @@ df_atividades_completo_2022 = pd.read_csv('datasets/predados/atividades_fisicas_
 df_atividades_completo_2023 = pd.read_csv('datasets/predados/atividades_fisicas_2023.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_completo_2024 = pd.read_csv('datasets/predados/atividades_fisicas_2024.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_completo_2025 = pd.read_csv('datasets/predados/atividades_fisicas_2025.csv', sep=',', encoding="ISO-8859-1")
+df_atividades_completo_2026 = pd.read_csv('datasets/predados/atividades_fisicas_2026.csv', sep=',', encoding="ISO-8859-1")
 
 df_atividades_simplificado_todos = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_todos.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_simplificado_2020 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2020.csv', sep=',', encoding="ISO-8859-1")
@@ -43,8 +44,7 @@ df_atividades_simplificado_2022 = pd.read_csv('datasets/predados/atividades_fisi
 df_atividades_simplificado_2023 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2023.csv', sep=',', encoding="ISO-8859-1")
 df_atividades_simplificado_2024 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="UTF-8")
 df_atividades_simplificado_2025 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
-
-df_sumario_2024 = pd.read_csv('datasets/gerais/sumario_atividades_2024.csv', sep=',', encoding="UTF-8")
+df_atividades_simplificado_2026 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2026.csv', sep=',', encoding="ISO-8859-1")
 
 df_atvs_tipo_todos = pd.read_csv('datasets/gerais/atividades_geral_por_tipo.csv', sep=',', encoding="UTF-8")
 df_atvs_dia_semana_todos = pd.read_csv('datasets/gerais/atividades_geral_por_dia_semana.csv', sep=',', encoding="UTF-8")
@@ -55,9 +55,14 @@ df_sumario_atvs_2022 = pd.read_csv('datasets/gerais/sumario_atividades_2022.csv'
 df_sumario_atvs_2023 = pd.read_csv('datasets/gerais/sumario_atividades_2023.csv', sep=',', encoding="UTF-8")
 df_sumario_atvs_2024 = pd.read_csv('datasets/gerais/sumario_atividades_2024.csv', sep=',', encoding="UTF-8")
 df_sumario_atvs_2025 = pd.read_csv('datasets/gerais/sumario_atividades_2025.csv', sep=',', encoding="UTF-8")
+df_sumario_atvs_2026 = pd.read_csv('datasets/gerais/sumario_atividades_2026.csv', sep=',', encoding="UTF-8")
+
+
 df_sumario_atvs_todos = pd.concat(
     [
-        df_sumario_atvs_2020, df_sumario_atvs_2021, df_sumario_atvs_2022, df_sumario_atvs_2023, df_sumario_atvs_2024, df_sumario_atvs_2025
+        df_sumario_atvs_2020, df_sumario_atvs_2021, df_sumario_atvs_2022, 
+        df_sumario_atvs_2023, df_sumario_atvs_2024, df_sumario_atvs_2025, 
+        df_sumario_atvs_2026
     ], ignore_index=True) 
 
 # adicionado
@@ -125,34 +130,19 @@ nova_aba, tab_detalhamento, tab_corrida = st.tabs(
 )
 
 # filtro
-df_selecionado = df_atividades_simplificado_2024
-ano_selecionado1 = 2025
+df_selecionado = df_atividades_simplificado_2026
+ano_selecionado1 = lista_anos[0]
+
 if st.session_state.ano_selecionado is None:
-    df_selecionado = df_atividades_simplificado_2024
+    df_selecionado = df_atividades_simplificado_2026
 else:
 
-    if st.session_state.ano_selecionado == '2020':
-        ano_selecionado1 = 2020
-        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
-    elif st.session_state.ano_selecionado == '2021':
-        ano_selecionado1 = 2021
-        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
-    elif st.session_state.ano_selecionado == '2022':
-        ano_selecionado1 = 2022
-        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
-    elif st.session_state.ano_selecionado == '2023':
-        ano_selecionado1 = 2023
-        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
-    elif st.session_state.ano_selecionado == '2024':
-        ano_selecionado1 = 2024
-        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
-    elif st.session_state.ano_selecionado == '2025':
-        ano_selecionado1 = 2025
-        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
-    elif st.session_state.ano_selecionado == OPCAO_TODOS:
+    if st.session_state.ano_selecionado == OPCAO_TODOS:
         ano_selecionado1 = OPCAO_TODOS
         df_selecionado = df_atividades_simplificado_todos
-
+    else:
+        ano_selecionado1 = int(st.session_state.ano_selecionado)
+        df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
 
 # ==============================================================================
 with nova_aba:
@@ -199,19 +189,17 @@ with nova_aba:
     elif ano_selecionado1 == 'Todos':
         df_filtro_pizza = df_atvs_tipo_todos
         df_filtro_barras = df_sumario_atvs_todos
-        titulo_barras = f'Atividades Físicas entre 2020 e 2025'
+        titulo_barras = f'Atividades Físicas entre {ano_inicio} e {ano_fim}'
 
     with col4:
         # Gráfico de pizza para distribuição por tipo
         st.subheader("Distribuição de Atividades por Tipo")
         grafico_pizza = grafico_pizza_tipo_atv(df_filtro_pizza)
-        #st.altair_chart(grafico_pizza, width="use_container")
         st.altair_chart(grafico_pizza, use_container_width=True)
 
     with col5:
         st.subheader("Barras: Atividades Físicas por Ano")
         grafico_atividades_ano_mes = gera_grafico_barras_atividades_mes(df_filtro_barras, titulo_barras)
-        #st.altair_chart(grafico_atividades_ano_mes, width="use_container")
         st.altair_chart(grafico_atividades_ano_mes, use_container_width=True)
 
     # ====== Linha 3 ======
@@ -228,7 +216,8 @@ with nova_aba:
             grafico_ranking_01 = gera_grafico_ranking_tipo_02_ano_mes(df_filtro_ranking_tipo, titulo)    
             
         elif ano_selecionado1 == 'Todos':
-            titulo =f'Ranking de Atividades por tipo (2020 a 2025)'
+            #lista_anos[0]
+            titulo =f'Ranking de Atividades por tipo ({ano_inicio} a {ano_fim})'
             grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
 
         st.altair_chart(grafico_ranking_01, use_container_width=True)
@@ -255,20 +244,22 @@ with nova_aba:
     if ano_selecionado1 != 'Todos':
         df_filtro_tipo = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
         df_dia_semana = df_atvs_dia_semana_todos[(df_atvs_dia_semana_todos['ano'] == ano_selecionado1)]
+        titulo_col8 =f'Atividades Por Tipo em {ano_selecionado1}'
+        titulo_col9 =f'Atividades Por Dia da Semana em {ano_selecionado1}'
     elif ano_selecionado1 == 'Todos':
         df_filtro_tipo = df_atvs_tipo_todos
         df_dia_semana = df_atvs_dia_semana_todos
+        titulo_col8 =f'Atividades Por Tipo entre {ano_inicio} e {ano_fim}'
+        titulo_col9 =f'Atividades Por Dia da Semana entre {ano_inicio} e {ano_fim}'
 
     with col8:
         st.subheader(f"Atividades Por Tipo em {ano_selecionado1}")
-        titulo =f'Atividades Por Tipo em {ano_selecionado1}'
-        grafico_barras_emp_01 = grafico_barras_empilhadas_por_tipo(titulo, df_filtro_tipo)    
+        grafico_barras_emp_01 = grafico_barras_empilhadas_por_tipo(titulo_col8, df_filtro_tipo)    
         st.altair_chart(grafico_barras_emp_01, use_container_width=True)
 
     with col9:
         st.subheader(f"Atividades Por Dia da Semana em {ano_selecionado1}")
-        titulo =f'Atividades Por Dia da Semana em {ano_selecionado1}'
-        grafico_barras_emp_02 = grafico_barras_empilhadas_por_dia_semana(titulo, df_dia_semana)    
+        grafico_barras_emp_02 = grafico_barras_empilhadas_por_dia_semana(titulo_col9, df_dia_semana)    
         st.altair_chart(grafico_barras_emp_02, use_container_width=True)
 
 
@@ -278,8 +269,8 @@ with nova_aba:
     if st.session_state.ano_selecionado == OPCAO_TODOS:
         df_filtro_mapa_tipo = df_atvs_tipo_todos
         df_filtro_mapa_dia_semana = df_atvs_dia_semana_todos
-        titulo_tipo =f'Mapa de Calor por Tipo de Atividades entre 2020 e 2025'
-        titulo_dia_semana =f'Mapa de Calor por Dia da Semana entre 2020 e 2025'
+        titulo_tipo =f'Mapa de Calor por Tipo de Atividades entre  {ano_inicio} e {ano_fim}'
+        titulo_dia_semana =f'Mapa de Calor por Dia da Semana entre {ano_inicio} e {ano_fim}'
 
     elif st.session_state.ano_selecionado != OPCAO_TODOS:
         df_filtro_mapa_tipo = df_atvs_tipo_todos[(df_atvs_tipo_todos['ano'] == ano_selecionado1)]
@@ -331,14 +322,14 @@ with tab_detalhamento:
     """, unsafe_allow_html=True)
     
     # Definindo os anos disponíveis para seleção
-    anos_disponiveis = ['2020', '2021', '2022', '2023', '2024', '2025']
+    anos_disponiveis = sorted(df_atividades_simplificado_todos['data_ano'].unique(), reverse=True)    
     
     # Organizando os filtros em 3 colunas
     col1, col2, col3 = st.columns(3)
     
     # Coluna 1: Filtro de ano
     with col1:
-        filtro_ano = st.selectbox('Selecione o ano:', anos_disponiveis, index=5)  # Default para 2025
+        filtro_ano = st.selectbox('Selecione o ano:', anos_disponiveis, index=0)  # Default para 2026
     
     # Coluna 2: Checkbox para habilitar filtro por mês
     with col2:
@@ -381,6 +372,8 @@ with tab_detalhamento:
         df_completo = df_atividades_completo_2024.copy()
     elif filtro_ano == '2025':
         df_completo = df_atividades_completo_2025.copy()
+    elif filtro_ano == '2026':
+        df_completo = df_atividades_completo_2026.copy()
     
     # Filtrar por mês se necessário
     if filtrar_por_mes and mes_selecionado is not None and df_completo is not None:
@@ -450,7 +443,7 @@ with tab_detalhamento:
             df_exibicao = df_exibicao.rename(columns=renomear)
             
             # Exibir a tabela usando o método dataframe do Streamlit
-            st.dataframe(df_exibicao, use_container_width=True)
+            st.dataframe(df_exibicao, width='content')
             
             # Área para exibir detalhes de uma atividade específica
             st.markdown('### Detalhes da Atividade')
@@ -687,13 +680,13 @@ with tab_corrida:
         col_img1, col_img2, col_img3, col_img4 = st.columns(4)
         
         with col_img1:
-            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", use_container_width=True)
+            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", width='content')
         with col_img2:
-            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", use_container_width=True)
+            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", width='content')
         with col_img3:
-            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", use_container_width=True)
+            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", width='content')
         with col_img4:
-            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", use_container_width=True)
+            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", width='content')
         
         st.markdown("---")
         
@@ -746,7 +739,7 @@ with tab_corrida:
                                title='Velocidade (km/h) vs Tempo (min)',
                                labels={'cumulative_time': 'Tempo (min)', 'speed_kmh': 'Velocidade (km/h)'})
             fig_speed.update_traces(line_color='blue')
-            st.plotly_chart(fig_speed, use_container_width=True)
+            st.plotly_chart(fig_speed, width='content')
         
         with col2:
             st.subheader("Frequência Cardíaca")
@@ -755,7 +748,7 @@ with tab_corrida:
                                 title='Frequência Cardíaca (bpm) vs Tempo (min)',
                                 labels={'cumulative_time': 'Tempo (min)', 'heart_rate': 'FC (bpm)'})
                 fig_hr.update_traces(line_color='red')
-                st.plotly_chart(fig_hr, use_container_width=True)
+                st.plotly_chart(fig_hr, width='content')
             else:
                 st.info("Dados de frequência cardíaca não disponíveis")
         
@@ -765,7 +758,7 @@ with tab_corrida:
                                title='Perfil de Elevação ao Longo da Corrida',
                                labels={'cumulative_distance': 'Distância (km)', 'elevation': 'Elevação (m)'})
         fig_elevation.update_traces(fill='tonexty', fillcolor='rgba(0,100,80,0.2)', line_color='green')
-        st.plotly_chart(fig_elevation, use_container_width=True)
+        st.plotly_chart(fig_elevation, width='content')
         
         # Gráfico 3: Pace vs Distância (inspirado na imagem 03)
         st.subheader("Ritmo ao Longo da Corrida")
@@ -777,7 +770,7 @@ with tab_corrida:
                           title='Ritmo (min/km) vs Distância (km)',
                           labels={'cumulative_distance': 'Distância (km)', 'pace': 'Ritmo (min/km)'})
         fig_pace.update_traces(line_color='orange')
-        st.plotly_chart(fig_pace, use_container_width=True)
+        st.plotly_chart(fig_pace, width='content')
         
         # Gráfico 4: Cadência (inspirado na imagem 04)
         if 'cadence' in df_corrida.columns and df_corrida['cadence'].notna().any():
@@ -786,7 +779,7 @@ with tab_corrida:
                                  title='Cadência (passos/min) vs Tempo (min)',
                                  labels={'cumulative_time': 'Tempo (min)', 'cadence': 'Cadência (spm)'})
             fig_cadence.update_traces(line_color='purple')
-            st.plotly_chart(fig_cadence, use_container_width=True)
+            st.plotly_chart(fig_cadence, width='content')
         
         # Mapa da rota
         st.subheader("🗺️ Mapa da Rota")

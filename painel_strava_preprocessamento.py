@@ -61,6 +61,7 @@ def salvar_arquivos_atividades_simplificados_anos():
   df_atividades_2023 = pd.read_csv('datasets/predados/atividades_fisicas_2023.csv', sep=',', encoding="ISO-8859-1")
   df_atividades_2024 = pd.read_csv('datasets/predados/atividades_fisicas_2024.csv', sep=',', encoding="ISO-8859-1")
   df_atividades_2025 = pd.read_csv('datasets/predados/atividades_fisicas_2025.csv', sep=',', encoding="ISO-8859-1")
+  df_atividades_2026 = pd.read_csv('datasets/predados/atividades_fisicas_2026.csv', sep=',', encoding="ISO-8859-1")
   df_atividades_todos = pd.read_csv('datasets/predados/atividades_fisicas_todos.csv', sep=',', encoding="ISO-8859-1")
 
   lista_dfs_anos = [
@@ -69,7 +70,8 @@ def salvar_arquivos_atividades_simplificados_anos():
     (2022,df_atividades_2022),
     (2023,df_atividades_2023),
     (2024,df_atividades_2024),
-    (2025,df_atividades_2025)
+    (2025,df_atividades_2025),
+    (2026,df_atividades_2026)
   ] 
 
   nome_arquivo = f'datasets/predados/atividades_fisicas_simplificado_todos.csv'
@@ -109,6 +111,7 @@ def salvar_arquivos_somatorios_anos():
     df_atividades_2023 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2023.csv', sep=',', encoding="ISO-8859-1")
     df_atividades_2024 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2024.csv', sep=',', encoding="ISO-8859-1")
     df_atividades_2025 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2025.csv', sep=',', encoding="ISO-8859-1")
+    df_atividades_2026 = pd.read_csv('datasets/predados/atividades_fisicas_simplificado_2026.csv', sep=',', encoding="ISO-8859-1")
 
     lista_dfs_anos = [
         (2020,df_atividades_2020),
@@ -116,7 +119,8 @@ def salvar_arquivos_somatorios_anos():
         (2022,df_atividades_2022),
         (2023,df_atividades_2023),
         (2024,df_atividades_2024),
-        (2025,df_atividades_2025)
+        (2025,df_atividades_2025),
+        (2026,df_atividades_2026)
     ]
 
     for item in lista_dfs_anos:
