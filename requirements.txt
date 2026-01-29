@@ -1,10 +1,9 @@
 pandas
 numpy
 geopandas
-streamlit
+streamlit>=1.50.0
 streamlit-folium
-altair<5
-altair_saver
+altair>=5.0.0
 vega_datasets
 folium
 vegafusion[embed]
