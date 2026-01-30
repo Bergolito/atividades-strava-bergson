@@ -7,6 +7,7 @@ import folium
 import gpxpy
 import plotly.express as px
 import numpy as np
+import os
 
 from streamlit_folium import st_folium
 from painel_strava_funcoes import *
@@ -216,7 +217,6 @@ with nova_aba:
             grafico_ranking_01 = gera_grafico_ranking_tipo_02_ano_mes(df_filtro_ranking_tipo, titulo)    
             
         elif ano_selecionado1 == 'Todos':
-            #lista_anos[0]
             titulo =f'Ranking de Atividades por tipo ({ano_inicio} a {ano_fim})'
             grafico_ranking_01 = gera_grafico_ranking_tipo_01(df_atvs_tipo_todos, titulo)    
 
@@ -321,16 +321,47 @@ with tab_detalhamento:
     </style>
     """, unsafe_allow_html=True)
     
+
     # Definindo os anos disponíveis para seleção
     anos_disponiveis = sorted(df_atividades_simplificado_todos['data_ano'].unique(), reverse=True)    
     
     # Organizando os filtros em 3 colunas
     col1, col2, col3 = st.columns(3)
-    
+
+    df_completo = df_atividades_todos.copy()
+
     # Coluna 1: Filtro de ano
     with col1:
-        filtro_ano = st.selectbox('Selecione o ano:', anos_disponiveis, index=0)  # Default para 2026
-    
+
+        if st.session_state.ano_selecionado == OPCAO_TODOS:
+            df_selecionado = df_atividades_simplificado_todos
+        else:
+            ano_selecionado1 = int(st.session_state.ano_selecionado)
+            df_selecionado = df_atividades_simplificado_todos[df_atividades_simplificado_todos['data_ano'] == ano_selecionado1]
+
+        if st.session_state.ano_selecionado == OPCAO_TODOS:
+            st.markdown('filtro_ano is None ', unsafe_allow_html=True)
+            df_completo = df_atividades_todos.copy()
+        else:
+
+            # Definir o DataFrame baseado no ano selecionado
+            if ano_selecionado == '2020':
+                df_completo = df_atividades_completo_2020.copy()
+            elif ano_selecionado == '2021':
+                df_completo = df_atividades_completo_2021.copy()
+            elif ano_selecionado == '2022':
+                df_completo = df_atividades_completo_2022.copy()
+            elif ano_selecionado == '2023':
+                df_completo = df_atividades_completo_2023.copy()
+            elif ano_selecionado == '2024':
+                df_completo = df_atividades_completo_2024.copy()
+            elif ano_selecionado == '2025':
+                df_completo = df_atividades_completo_2025.copy()
+            elif ano_selecionado == '2026':
+                df_completo = df_atividades_completo_2026.copy()
+            
+            st.markdown('df_completo' + str(df_completo.shape[0]), unsafe_allow_html=True)
+
     # Coluna 2: Checkbox para habilitar filtro por mês
     with col2:
         filtrar_por_mes = st.checkbox('Filtrar por mês')
@@ -358,25 +389,9 @@ with tab_detalhamento:
             mes_selecionado = None
             st.empty()  # Espaço vazio para manter alinhamento
     
-    # Definir o DataFrame baseado no ano selecionado
-    df_completo = None
-    if filtro_ano == '2020':
-        df_completo = df_atividades_completo_2020.copy()
-    elif filtro_ano == '2021':
-        df_completo = df_atividades_completo_2021.copy()
-    elif filtro_ano == '2022':
-        df_completo = df_atividades_completo_2022.copy()
-    elif filtro_ano == '2023':
-        df_completo = df_atividades_completo_2023.copy()
-    elif filtro_ano == '2024':
-        df_completo = df_atividades_completo_2024.copy()
-    elif filtro_ano == '2025':
-        df_completo = df_atividades_completo_2025.copy()
-    elif filtro_ano == '2026':
-        df_completo = df_atividades_completo_2026.copy()
-    
     # Filtrar por mês se necessário
     if filtrar_por_mes and mes_selecionado is not None and df_completo is not None:
+
         # Verificar se 'Activity Date' está no formato correto
         if 'Activity Date' in df_completo.columns:
             try:
@@ -505,16 +520,16 @@ with tab_detalhamento:
                 if isinstance(filename, str) and filename.startswith('activities/'):
                     # Extrair ID do arquivo
                     tcx_id = filename.replace('activities/', '').split('.')[0]
-                    #print(f"tcx_id => {tcx_id}")
                 
                 # Verificar se existe arquivo TCX na pasta 'arquivos-ok'
                 if tcx_id:
-                    import os
+                    #import os
                     tcx_filepath_ok = f"activities-tcx/arquivos-ok/{tcx_id}.tcx"
                     csv_filepath = f"activities-tcx/arquivos-csv/{tcx_id}.csv"
                     
-                    if os.path.exists(tcx_filepath_ok):
-                        st.success(f"Arquivo TCX encontrado: {tcx_id}.tcx")
+                    #if os.path.exists(tcx_filepath_ok):
+                    if os.path.exists(csv_filepath):
+                        st.success(f"Arquivo CSV encontrado: {tcx_id}.csv")
                         
                         # Verificar se existe o CSV correspondente
                         if os.path.exists(csv_filepath):
@@ -680,13 +695,13 @@ with tab_corrida:
         col_img1, col_img2, col_img3, col_img4 = st.columns(4)
         
         with col_img1:
-            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", container='stretch')
+            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01")
         with col_img2:
-            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", container='stretch')
+            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02")
         with col_img3:
-            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", container='stretch')
+            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03")
         with col_img4:
-            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", container='stretch')
+            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04")
         
         st.markdown("---")
         
