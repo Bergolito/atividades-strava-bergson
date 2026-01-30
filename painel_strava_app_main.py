@@ -360,8 +360,6 @@ with tab_detalhamento:
             elif ano_selecionado == '2026':
                 df_completo = df_atividades_completo_2026.copy()
             
-            st.markdown('df_completo' + str(df_completo.shape[0]), unsafe_allow_html=True)
-
     # Coluna 2: Checkbox para habilitar filtro por mês
     with col2:
         filtrar_por_mes = st.checkbox('Filtrar por mês')
