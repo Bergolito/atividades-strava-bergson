@@ -45,9 +45,7 @@ def gera_grafico_barras_tipo_exercicio(df_filtro, titulo):
         tooltip=['tipo_atividade', 'qtd'],      
         color=alt.Color('tipo_atividade:N', title='Tipo de Atividade')     
     ).properties(
-        title=alt.Title(
-            text=titulo
-        ),
+        title=titulo,
         width=800,
         height=600
     ).interactive()
@@ -62,9 +60,7 @@ def gera_grafico_barras_atividades_mes(df_filtro, titulo):
         tooltip=['mes', 'qtd'],      
         color=alt.Color('mes:N', title='Mês')     
     ).properties(
-        title=alt.Title(
-            text=titulo
-        ),
+        title=titulo,
         width=600,
         height=400
     ).interactive()
