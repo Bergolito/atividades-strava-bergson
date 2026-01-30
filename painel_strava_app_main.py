@@ -680,13 +680,13 @@ with tab_corrida:
         col_img1, col_img2, col_img3, col_img4 = st.columns(4)
         
         with col_img1:
-            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", use_container_width=False)
+            st.image("dados-corrida/dados-01.jpeg", caption="Referência 01", container='stretch')
         with col_img2:
-            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", use_container_width=False)
+            st.image("dados-corrida/dados-02.jpeg", caption="Referência 02", container='stretch')
         with col_img3:
-            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", use_container_width=False)
+            st.image("dados-corrida/dados-03.jpeg", caption="Referência 03", container='stretch')
         with col_img4:
-            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", use_container_width=False)
+            st.image("dados-corrida/dados-04.jpeg", caption="Referência 04", container='stretch')
         
         st.markdown("---")
         
