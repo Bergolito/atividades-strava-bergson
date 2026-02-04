@@ -1,10 +1,14 @@
-# build the app
-#pack build sample-app \
-#    --builder cnbs/sample-builder:noble \
-#    --path  samples/apps/bash-script/
-pack build painel-strava --buildpack paketo-buildpacks/python \
-  --builder paketobuildpacks/builder-jammy-base
+[_]
+schema-version = "0.2"
+id = "bergsonbarros.painel-strava"
+name = "Painel Strava"
+version = "1.0.0"
 
-# run the app
-#docker run sample-app
-docker run --rm -it -e PORT=8501 -p 8501:8501  painel-strava
+[io.buildpacks]
+builder = "paketobuildpacks/builder-jammy-base"
+
+[[io.buildpacks.group]]
+uri = "paketo-buildpacks/python"
+
+[[io.buildpacks.group]]
+uri = "paketo-buildpacks/procfile"
