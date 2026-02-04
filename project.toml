@@ -1,0 +1,10 @@
+# build the app
+#pack build sample-app \
+#    --builder cnbs/sample-builder:noble \
+#    --path  samples/apps/bash-script/
+pack build painel-strava --buildpack paketo-buildpacks/python \
+  --builder paketobuildpacks/builder-jammy-base
+
+# run the app
+#docker run sample-app
+docker run --rm -it -e PORT=8501 -p 8501:8501  painel-strava
