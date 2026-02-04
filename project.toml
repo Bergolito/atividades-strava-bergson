@@ -10,5 +10,5 @@ builder = "paketobuildpacks/builder-jammy-base"
 [[io.buildpacks.group]]
 uri = "paketo-buildpacks/python"
 
-[[io.buildpacks.group]]
-uri = "paketo-buildpacks/procfile"
+#[[io.buildpacks.group]]
+#uri = "paketo-buildpacks/procfile"
